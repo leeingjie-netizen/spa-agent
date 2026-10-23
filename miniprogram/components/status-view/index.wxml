@@ -1,0 +1,6 @@
+<view class="status-view">
+  <view class="status-art status-{{type}}"><view class="status-art-inner"></view></view>
+  <text class="status-title">{{title}}</text>
+  <text wx:if="{{description}}" class="status-description">{{description}}</text>
+  <button wx:if="{{actionText}}" class="status-action" bindtap="handleAction">{{actionText}}</button>
+</view>

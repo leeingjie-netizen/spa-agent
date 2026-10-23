@@ -1,0 +1,22 @@
+<view class="result-page">
+  <block wx:if="{{result}}">
+    <view class="success-mark"><view class="check-line left"></view><view class="check-line right"></view></view>
+    <text class="result-title">预约已提交</text>
+    <text class="result-desc">系统已完成时段占用，请按预约时间到店</text>
+
+    <view class="result-card">
+      <view class="result-brand"><text>QI XIN</text><text class="result-status">已预约</text></view>
+      <text class="result-service">{{result.serviceName}}</text>
+      <view class="result-divider"></view>
+      <view class="result-row"><text>护理技师</text><text>{{result.staffName}}</text></view>
+      <view class="result-row"><text>预约日期</text><text>{{result.appointment.appointmentDate}}</text></view>
+      <view class="result-row"><text>预约时间</text><text>{{result.appointment.startTime}} - {{result.appointment.endTime}}</text></view>
+      <view class="result-row"><text>预约金额</text><text>¥{{result.appointment.amount}}</text></view>
+      <view class="result-row"><text>预约编号</text><text>{{result.appointment.appointmentNo}}</text></view>
+    </view>
+
+    <button class="primary-button" bindtap="goToOrders">查看我的预约</button>
+    <button class="home-button" bindtap="goToHome">返回首页</button>
+  </block>
+  <status-view wx:else type="error" title="没有找到预约结果" description="请前往订单页面查看最新预约" actionText="查看订单" bind:action="goToOrders"></status-view>
+</view>

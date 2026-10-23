@@ -1,0 +1,30 @@
+<view class="detail-page">
+  <block wx:if="{{order}}">
+    <view class="status-hero status-{{order.statusTone}}">
+      <text class="status-label">{{order.statusLabel}}</text>
+      <text class="status-desc">{{order.cancellable ? '当前预约符合预取消条件' : (order.cancelReason || '请以订单实际状态为准')}}</text>
+    </view>
+
+    <view class="detail-card">
+      <text class="card-eyebrow">APPOINTMENT</text>
+      <text class="service-name">{{order.serviceName}}</text>
+      <view class="info-row"><text>预约日期</text><text>{{order.appointmentDate}}</text></view>
+      <view class="info-row"><text>预约时间</text><text>{{order.startTimeDisplay}} - {{order.endTimeDisplay}}</text></view>
+      <view class="info-row"><text>护理技师</text><text>{{order.staffName}}</text></view>
+      <view class="info-row"><text>预约金额</text><text>¥{{order.amount}}</text></view>
+      <view class="info-row"><text>预约编号</text><text>{{order.appointmentNo}}</text></view>
+    </view>
+
+    <view class="payment-card">
+      <view><text class="payment-title">支付信息</text><text class="payment-desc">现有后端未区分支付状态，正式支付尚未接入</text></view>
+      <text class="pending-badge">待开发</text>
+    </view>
+
+    <view class="detail-actions">
+      <button wx:if="{{order.cancellable}}" class="cancel-button" loading="{{cancelling}}" bindtap="confirmCancel">取消预约</button>
+      <button wx:if="{{order.status === 2 || order.status === 3}}" class="primary-button" bindtap="rebook">再次预约</button>
+      <button wx:if="{{order.status === 0}}" class="primary-button" bindtap="showPaymentNotice">支付能力待接入</button>
+    </view>
+  </block>
+  <status-view wx:else type="error" title="订单信息不存在" description="请返回订单列表重新选择"></status-view>
+</view>

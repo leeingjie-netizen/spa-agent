@@ -1,0 +1,40 @@
+<view class="page-shell profile-page">
+  <view class="profile-header">
+    <text class="header-eyebrow">MEMBER CENTRE</text>
+    <view class="user-row">
+      <view class="avatar"><text>栖</text></view>
+      <view class="user-copy"><text class="user-name">{{user.nickname}}</text><text class="user-note">开发演示账户 · userId {{user.id}}</text></view>
+      <button class="settings-button" bindtap="showEnvironment">···</button>
+    </view>
+
+    <view class="member-card">
+      <view class="card-orbit orbit-one"></view><view class="card-orbit orbit-two"></view>
+      <text class="member-eyebrow">QI XIN MEMBER</text>
+      <text class="member-title">身心养护计划</text>
+      <text class="member-status">会员体系未开通</text>
+      <text class="member-number">DEMO · {{user.id}}</text>
+    </view>
+  </view>
+
+  <view class="asset-grid">
+    <button wx:for="{{assetItems}}" wx:key="key" class="asset-item" data-label="{{item.label}}" bindtap="handleAsset"><text class="asset-value">{{item.value}}</text><text class="asset-label">{{item.label}}</text></button>
+  </view>
+
+  <view class="appointment-entry" bindtap="goToOrders">
+    <view class="entry-icon"><view class="calendar-line"></view></view>
+    <view class="entry-copy"><text class="entry-title">我的预约</text><text class="entry-desc">查看真实预约、状态与取消规则</text></view>
+    <text class="entry-arrow">›</text>
+  </view>
+
+  <view class="service-panel">
+    <text class="panel-title">会员服务</text>
+    <button wx:for="{{serviceItems}}" wx:key="key" class="service-row" data-key="{{item.key}}" data-enabled="{{item.enabled}}" bindtap="handleService">
+      <view class="service-dot dot-{{index % 3}}"></view>
+      <view class="service-copy"><text class="service-title">{{item.title}}</text><text class="service-desc">{{item.description}}</text></view>
+      <text wx:if="{{!item.enabled}}" class="pending-tag">待接入</text>
+      <text class="row-arrow">›</text>
+    </button>
+  </view>
+
+  <view class="profile-note"><text>栖心 SPA · 让每一次停留都有意义</text><text>账户与资产信息最终以服务端为准</text></view>
+</view>

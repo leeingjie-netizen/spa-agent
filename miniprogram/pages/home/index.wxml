@@ -1,0 +1,77 @@
+<view class="page-shell home-page">
+  <view class="brand-header page-content">
+    <view>
+      <text class="brand-kicker">QI XIN WELLNESS</text>
+      <text class="brand-title">栖心</text>
+      <text class="brand-greeting">下午好，给自己一段松弛时光</text>
+    </view>
+    <button class="ai-mini" bindtap="goToAi"><text class="ai-spark">✦</text><text>AI 顾问</text></button>
+  </view>
+
+  <swiper class="hero-swiper" indicator-dots autoplay circular interval="5000" indicator-color="rgba(255,255,255,.4)" indicator-active-color="#ffffff">
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <view class="hero-slide hero-{{item.theme}}" data-action="{{item.action}}" bindtap="handleBannerTap">
+        <view class="hero-orbit orbit-a"></view>
+        <view class="hero-orbit orbit-b"></view>
+        <view class="hero-copy">
+          <text class="hero-eyebrow">{{item.eyebrow}}</text>
+          <text class="hero-title">{{item.title}}</text>
+          <text class="hero-subtitle">{{item.subtitle}}</text>
+          <text class="hero-link">开始探索  →</text>
+        </view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view class="quick-grid page-content">
+    <button class="quick-item" bindtap="goToServices"><view class="quick-icon">预约</view><text>预约护理</text><text class="quick-desc">选择服务与时间</text></button>
+    <button class="quick-item" bindtap="goToServices"><view class="quick-icon">甄选</view><text>热门服务</text><text class="quick-desc">查看人气护理</text></button>
+    <button class="quick-item quick-ai" bindtap="goToAi"><view class="quick-icon">AI</view><text>智能推荐</text><text class="quick-desc">一句话匹配方案</text></button>
+  </view>
+
+  <view class="section page-content">
+    <section-header eyebrow="CURATED FOR YOU" title="今日精选" actionText="全部服务" bind:action="goToServices"></section-header>
+    <status-view wx:if="{{loading}}" type="loading" title="正在准备护理清单"></status-view>
+    <status-view wx:elif="{{errorMessage}}" type="error" title="暂时无法获取服务" description="{{errorMessage}}" actionText="重新加载" bind:action="loadHomeData"></status-view>
+    <view wx:else class="featured-list">
+      <service-card wx:for="{{services}}" wx:key="id" service="{{item}}" index="{{index}}" compact bind:select="goToServiceDetail" bind:book="goToBooking"></service-card>
+    </view>
+  </view>
+
+  <view class="section activity-section page-content">
+    <section-header eyebrow="SEASONAL NOTES" title="本月灵感"></section-header>
+    <scroll-view class="activity-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="activity-row">
+        <view wx:for="{{activities}}" wx:key="id" class="activity-card activity-{{item.theme}}">
+          <text class="activity-kicker">{{item.kicker}}</text>
+          <text class="activity-title">{{item.title}}</text>
+          <text class="activity-desc">{{item.description}}</text>
+          <text class="demo-label">展示内容</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section page-content" wx:if="{{staff.length}}">
+    <section-header eyebrow="OUR THERAPISTS" title="疗愈顾问"></section-header>
+    <view class="staff-list">
+      <view class="staff-card" wx:for="{{staff}}" wx:key="id">
+        <view class="staff-avatar avatar-{{index}}"><text>{{item.name}}</text></view>
+        <text class="staff-name">{{item.name}}</text>
+        <text class="staff-intro">{{item.introduction}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="ai-banner page-content" bindtap="goToAi">
+    <view class="ai-orb">AI</view>
+    <view class="ai-banner-copy"><text class="ai-banner-title">不知道如何选择？</text><text class="ai-banner-desc">智能顾问会结合预算、时间与护理偏好，为你查询真实可预约方案。</text></view>
+    <text class="ai-arrow">›</text>
+  </view>
+
+  <view class="philosophy page-content">
+    <text class="philosophy-kicker">OUR PHILOSOPHY</text>
+    <text class="philosophy-title">以专业手法照顾身体，也温柔安放每一刻情绪。</text>
+    <text class="philosophy-note">预约价格、技师与可用时段均以系统实时数据为准。</text>
+  </view>
+</view>

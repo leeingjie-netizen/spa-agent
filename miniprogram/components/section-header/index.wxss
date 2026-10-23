@@ -1,0 +1,5 @@
+.section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28rpx; }
+.section-eyebrow, .section-title { display: block; }
+.section-eyebrow { margin-bottom: 8rpx; color: #aa895b; font-size: 20rpx; font-weight: 600; letter-spacing: 4rpx; }
+.section-title { color: #23362f; font-family: Georgia, "Times New Roman", serif; font-size: 40rpx; font-weight: 600; }
+.section-action { padding: 8rpx 0; color: #567264; font-size: 24rpx; }

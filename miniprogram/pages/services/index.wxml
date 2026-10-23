@@ -1,0 +1,37 @@
+<view class="page-shell services-page">
+  <view class="service-hero page-content">
+    <text class="hero-eyebrow">TREATMENT MENU</text>
+    <text class="hero-title">找到适合此刻的护理</text>
+    <text class="hero-subtitle">价格、时长与可预约状态均来自实时业务数据</text>
+  </view>
+
+  <view class="search-wrap page-content">
+    <view class="search-box">
+      <view class="search-icon"></view>
+      <input class="search-input" value="{{keyword}}" placeholder="搜索服务名称或护理功效" placeholder-class="search-placeholder" bindinput="handleKeywordInput" />
+      <button wx:if="{{keyword}}" class="clear-button" bindtap="clearKeyword">×</button>
+    </view>
+  </view>
+
+  <scroll-view class="category-scroll" scroll-x show-scrollbar="{{false}}">
+    <view class="category-row">
+      <button wx:for="{{categories}}" wx:key="key" class="category-chip {{activeCategory === item.key ? 'is-active' : ''}}" data-key="{{item.key}}" bindtap="selectCategory">{{item.label}}</button>
+    </view>
+  </scroll-view>
+
+  <view class="service-count page-content" wx:if="{{!loading && !errorMessage}}">
+    <text>{{filteredServices.length}} 项护理</text>
+    <text class="count-note">真实服务数据</text>
+  </view>
+
+  <view class="page-content">
+    <status-view wx:if="{{loading}}" type="loading" title="正在读取服务"></status-view>
+    <status-view wx:elif="{{errorMessage}}" type="error" title="服务加载失败" description="{{errorMessage}}" actionText="重新加载" bind:action="loadServices"></status-view>
+    <status-view wx:elif="{{filteredServices.length === 0}}" title="没有找到匹配的服务" description="换一个关键词或分类试试"></status-view>
+    <view wx:else class="service-grid">
+      <view wx:for="{{filteredServices}}" wx:key="id" class="service-cell">
+        <service-card service="{{item}}" index="{{index}}" bind:select="goToDetail" bind:book="goToBooking"></service-card>
+      </view>
+    </view>
+  </view>
+</view>

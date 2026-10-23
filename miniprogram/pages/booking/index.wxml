@@ -1,0 +1,54 @@
+<view class="booking-page">
+  <status-view wx:if="{{loading}}" type="loading" title="正在准备预约信息"></status-view>
+  <status-view wx:elif="{{errorMessage}}" type="error" title="预约信息加载失败" description="{{errorMessage}}" actionText="重新加载" bind:action="loadBookingBase"></status-view>
+
+  <block wx:elif="{{service}}">
+    <view class="booking-summary">
+      <view class="summary-art"><text>栖</text></view>
+      <view class="summary-copy"><text class="summary-name">{{service.name}}</text><text class="summary-meta">{{service.durationMinutes}} 分钟 · 实时预约</text></view>
+      <text class="summary-price">¥{{service.price}}</text>
+    </view>
+
+    <view class="booking-section">
+      <view class="section-heading"><text class="step-number">01</text><view><text class="section-title">选择护理技师</text><text class="section-desc">仅展示支持当前服务的在岗技师</text></view></view>
+      <view wx:if="{{staffList.length}}" class="staff-list">
+        <button wx:for="{{staffList}}" wx:key="id" class="staff-option {{selectedStaffId === item.id ? 'is-selected' : ''}}" data-id="{{item.id}}" bindtap="selectStaff">
+          <view class="staff-avatar">{{item.name}}</view>
+          <view class="staff-copy"><text class="staff-name">{{item.name}}</text><text class="staff-intro">{{item.introduction || '专业护理技师'}}</text></view>
+          <view class="radio"><view class="radio-dot"></view></view>
+        </button>
+      </view>
+      <status-view wx:else title="暂无可选技师" description="当前服务尚未配置可服务技师"></status-view>
+    </view>
+
+    <view class="booking-section">
+      <view class="section-heading"><text class="step-number">02</text><view><text class="section-title">选择到店日期</text><text class="section-desc">可查看未来 10 天的排班</text></view></view>
+      <scroll-view class="date-scroll" scroll-x show-scrollbar="{{false}}">
+        <view class="date-row">
+          <button wx:for="{{dateOptions}}" wx:key="value" class="date-option {{selectedDate === item.value ? 'is-selected' : ''}}" data-date="{{item.value}}" bindtap="selectDate"><text class="date-week">{{item.week}}</text><text class="date-value">{{item.monthDay}}</text></button>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="booking-section">
+      <view class="section-heading"><text class="step-number">03</text><view><text class="section-title">选择开始时间</text><text class="section-desc">可用时段由排班与已占用 Slot 实时计算</text></view></view>
+      <status-view wx:if="{{!selectedStaffId}}" title="请先选择技师" description="选择技师后会自动查询可预约时段"></status-view>
+      <status-view wx:elif="{{slotsLoading}}" type="loading" title="正在查询可用时段"></status-view>
+      <status-view wx:elif="{{slots.length === 0}}" title="当天暂无可用时段" description="请尝试其他日期或技师"></status-view>
+      <view wx:else class="slot-grid">
+        <button wx:for="{{slots}}" wx:key="*this" class="slot-option {{selectedTime === item ? 'is-selected' : ''}}" data-time="{{item}}" bindtap="selectTime">{{item}}</button>
+      </view>
+    </view>
+
+    <view class="booking-section remark-section">
+      <view class="section-heading"><text class="step-number">04</text><view><text class="section-title">到店备注</text><text class="section-desc">选填，请勿填写敏感个人信息</text></view></view>
+      <textarea class="remark-input" maxlength="120" value="{{remark}}" placeholder="例如：肩颈容易酸痛，希望重点沟通" placeholder-class="remark-placeholder" bindinput="handleRemarkInput"></textarea>
+      <text class="remark-count">{{remark.length}} / 120</text>
+    </view>
+
+    <view class="submit-bar">
+      <view class="submit-price"><text class="submit-label">应付金额</text><text>¥{{service.price}}</text></view>
+      <button class="submit-button" disabled="{{!selectedStaffId || !selectedTime || submitting}}" loading="{{submitting}}" bindtap="submitBooking">{{submitting ? '提交中' : '确认预约'}}</button>
+    </view>
+  </block>
+</view>

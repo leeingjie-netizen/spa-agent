@@ -1,0 +1,25 @@
+.service-card { overflow: hidden; border: 1rpx solid rgba(49, 92, 76, 0.08); border-radius: 28rpx; background: #fff; box-shadow: 0 16rpx 44rpx rgba(40, 57, 50, 0.07); }
+.service-visual { position: relative; overflow: hidden; height: 270rpx; padding: 30rpx; background: #dfe9e1; }
+.visual-1 { background: #e9dfcf; }
+.visual-2 { background: #d8e2df; }
+.visual-3 { background: #eee3dc; }
+.visual-orbit { position: absolute; border: 2rpx solid rgba(255, 255, 255, 0.66); border-radius: 50%; }
+.orbit-one { top: -70rpx; right: -30rpx; width: 260rpx; height: 260rpx; }
+.orbit-two { right: 70rpx; bottom: -120rpx; width: 300rpx; height: 300rpx; }
+.visual-mark { position: absolute; right: 42rpx; bottom: 12rpx; color: rgba(255, 255, 255, 0.58); font-family: Georgia, serif; font-size: 160rpx; }
+.visual-duration { position: relative; color: #426354; font-size: 20rpx; font-weight: 600; letter-spacing: 3rpx; }
+.service-body { padding: 28rpx; }
+.service-tag-row, .service-footer { display: flex; align-items: center; justify-content: space-between; }
+.service-tag { color: #9a7b50; font-size: 20rpx; letter-spacing: 2rpx; }
+.service-arrow { color: #789085; font-size: 36rpx; }
+.service-name, .service-description { display: block; }
+.service-name { margin-top: 12rpx; color: #24342e; font-family: Georgia, "PingFang SC", serif; font-size: 34rpx; font-weight: 600; }
+.service-description { overflow: hidden; height: 72rpx; margin-top: 12rpx; color: #7b817c; font-size: 24rpx; line-height: 36rpx; }
+.service-footer { margin-top: 24rpx; }
+.price { color: #8f6744; font-size: 34rpx; font-weight: 600; }
+.currency { margin-right: 3rpx; font-size: 21rpx; }
+.book-button { padding: 15rpx 30rpx; border-radius: 34rpx; background: #315c4c; color: #fff; font-size: 23rpx; font-weight: 600; }
+.is-compact { display: flex; }
+.is-compact .service-visual { flex: 0 0 210rpx; height: 250rpx; }
+.is-compact .service-body { flex: 1; min-width: 0; }
+.is-compact .visual-mark { font-size: 110rpx; }

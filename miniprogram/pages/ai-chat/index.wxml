@@ -1,0 +1,37 @@
+<view class="chat-page">
+  <view class="chat-header">
+    <view class="assistant-avatar">AI</view>
+    <view class="assistant-copy"><text class="assistant-name">栖心智能顾问</text><text class="assistant-status"><text class="status-dot"></text>连接真实预约系统</text></view>
+    <button class="new-chat" bindtap="newConversation">新对话</button>
+  </view>
+
+  <scroll-view class="message-scroll" scroll-y scroll-with-animation scroll-into-view="{{scrollIntoView}}">
+    <view class="message-list">
+      <view wx:for="{{messages}}" wx:key="id" class="message-row message-{{item.role}}">
+        <view wx:if="{{item.role === 'assistant' || item.role === 'error'}}" class="bubble-avatar">AI</view>
+        <view class="message-bubble"><text user-select>{{item.content}}</text></view>
+      </view>
+
+      <view wx:if="{{sending}}" class="message-row message-assistant">
+        <view class="bubble-avatar">AI</view>
+        <view class="message-bubble typing"><text></text><text></text><text></text></view>
+      </view>
+
+      <button wx:if="{{retryContent && !sending}}" class="retry-message" bindtap="retryLast">重新发送上一条消息</button>
+
+      <view wx:if="{{messages.length === 1}}" class="suggestion-panel">
+        <text class="suggestion-title">你可以这样问</text>
+        <button wx:for="{{suggestions}}" wx:key="*this" class="suggestion-item" data-text="{{item}}" bindtap="useSuggestion">{{item}}<text>›</text></button>
+      </view>
+      <view id="message-bottom" class="message-bottom"></view>
+    </view>
+  </scroll-view>
+
+  <view class="composer">
+    <view class="composer-box">
+      <textarea class="message-input" auto-height maxlength="300" value="{{inputValue}}" placeholder="描述你的预约需求..." placeholder-class="input-placeholder" confirm-type="send" bindinput="handleInput" bindconfirm="sendMessage"></textarea>
+      <button class="send-button" disabled="{{!inputValue || sending}}" bindtap="sendMessage"><text>↑</text></button>
+    </view>
+    <text class="composer-note">AI 会查询真实业务数据，修改类操作仍需明确确认</text>
+  </view>
+</view>

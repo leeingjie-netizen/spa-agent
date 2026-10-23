@@ -1,0 +1,11 @@
+<view class="tab-bar">
+  <view wx:for="{{list}}" wx:key="pagePath" class="tab-item {{selected === index ? 'is-active' : ''}}" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
+    <view class="tab-icon icon-{{item.icon}}">
+      <view wx:if="{{item.icon === 'services'}}" class="grid-dot dot-one"></view>
+      <view wx:if="{{item.icon === 'services'}}" class="grid-dot dot-two"></view>
+      <view wx:if="{{item.icon === 'services'}}" class="grid-dot dot-three"></view>
+      <view wx:if="{{item.icon === 'services'}}" class="grid-dot dot-four"></view>
+    </view>
+    <text class="tab-text">{{item.text}}</text>
+  </view>
+</view>

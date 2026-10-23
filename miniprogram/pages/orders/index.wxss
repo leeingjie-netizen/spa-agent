@@ -1,0 +1,36 @@
+.orders-page { padding-top: 38rpx; }
+.orders-header { display: flex; flex-direction: column; }
+.header-eyebrow { color: #a48152; font-size: 19rpx; letter-spacing: 5rpx; }
+.header-title { margin-top: 12rpx; font-family: Georgia, "Songti SC", serif; font-size: 48rpx; font-weight: 600; }
+.header-desc { margin-top: 12rpx; color: #898e89; font-size: 21rpx; }
+.tab-scroll { margin-top: 34rpx; white-space: nowrap; }
+.tab-row { display: inline-flex; gap: 16rpx; padding: 0 32rpx 8rpx; }
+.status-tab { padding: 18rpx 30rpx; border: 1rpx solid #d9ded9; border-radius: 36rpx; color: #747b76; font-size: 23rpx; }
+.status-tab.is-active { border-color: #315c4c; background: #315c4c; color: #fff; }
+.capability-note { display: flex; flex-direction: column; margin-top: 20rpx; padding-top: 24rpx; padding-bottom: 24rpx; background: #ede5d8; }
+.note-title { color: #654f39; font-size: 24rpx; font-weight: 600; }
+.note-desc { margin-top: 9rpx; color: #8e806f; font-size: 20rpx; line-height: 1.55; }
+.order-content { margin-top: 28rpx; }
+.order-list { display: flex; flex-direction: column; gap: 22rpx; }
+.order-card { overflow: hidden; padding: 28rpx; border-radius: 28rpx; background: #fff; box-shadow: 0 14rpx 40rpx rgba(42,58,51,.06); }
+.order-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 22rpx; border-bottom: 1rpx solid #eef0ed; }
+.order-no { color: #8b918c; font-family: Georgia, sans-serif; font-size: 19rpx; letter-spacing: 1rpx; }
+.status-pill { padding: 8rpx 16rpx; border-radius: 22rpx; font-size: 20rpx; }
+.status-pending { background: #f2eadc; color: #8b6841; }
+.status-booked { background: #e4eee8; color: #315c4c; }
+.status-completed { background: #e8eaeb; color: #667078; }
+.status-cancelled { background: #f1e7e4; color: #936457; }
+.order-main { display: flex; align-items: center; padding: 26rpx 0; }
+.order-art { display: flex; flex: 0 0 112rpx; align-items: center; justify-content: center; height: 112rpx; margin-right: 22rpx; border-radius: 24rpx; background: #dfe9e1; color: #71907f; font-family: Georgia, "Songti SC", serif; font-size: 45rpx; }
+.order-copy { flex: 1; min-width: 0; }
+.service-name, .order-meta { display: block; }
+.service-name { overflow: hidden; font-size: 27rpx; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.order-meta { margin-top: 9rpx; color: #8e938f; font-size: 20rpx; }
+.order-price { margin-left: 14rpx; color: #8f6744; font-size: 29rpx; font-weight: 600; }
+.order-actions { display: flex; align-items: center; justify-content: flex-end; gap: 14rpx; padding-top: 20rpx; border-top: 1rpx solid #eef0ed; }
+.text-button, .outline-button, .solid-button { padding: 15rpx 24rpx; border-radius: 32rpx; font-size: 21rpx; }
+.text-button { color: #748079; }
+.outline-button { border: 1rpx solid #899b91; color: #536b5f; }
+.outline-button.danger { border-color: #b98778; color: #9b5e4a; }
+.solid-button { background: #315c4c; color: #fff; }
+.cancel-reason { color: #9b8478; font-size: 19rpx; }

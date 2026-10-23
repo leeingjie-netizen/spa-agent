@@ -1,0 +1,56 @@
+.home-page { padding-top: 26rpx; }
+.brand-header { display: flex; align-items: flex-start; justify-content: space-between; }
+.brand-kicker, .brand-title, .brand-greeting { display: block; }
+.brand-kicker { color: #9b7b50; font-size: 18rpx; letter-spacing: 5rpx; }
+.brand-title { margin-top: 5rpx; font-family: Georgia, "Songti SC", serif; font-size: 54rpx; font-weight: 600; }
+.brand-greeting { margin-top: 8rpx; color: #7f857f; font-size: 23rpx; }
+.ai-mini { display: flex; align-items: center; gap: 8rpx; margin-top: 12rpx; padding: 15rpx 22rpx; border: 1rpx solid rgba(49, 92, 76, .2); border-radius: 34rpx; color: #315c4c; font-size: 22rpx; }
+.ai-spark { color: #b28d58; }
+.hero-swiper { height: 440rpx; margin-top: 32rpx; }
+.hero-slide { position: relative; overflow: hidden; height: 410rpx; margin: 0 32rpx; border-radius: 36rpx; box-shadow: 0 20rpx 50rpx rgba(39, 64, 53, .16); }
+.hero-sage { background: linear-gradient(135deg, #557b68, #294d40); }
+.hero-amber { background: linear-gradient(135deg, #b08d63, #745b42); }
+.hero-forest { background: linear-gradient(135deg, #294a42, #192f2a); }
+.hero-orbit { position: absolute; border: 2rpx solid rgba(255, 255, 255, .18); border-radius: 50%; }
+.orbit-a { top: -100rpx; right: -60rpx; width: 370rpx; height: 370rpx; }
+.orbit-b { right: 50rpx; bottom: -220rpx; width: 440rpx; height: 440rpx; }
+.hero-copy { position: relative; display: flex; flex-direction: column; align-items: flex-start; padding: 66rpx 48rpx; color: #fff; }
+.hero-eyebrow { font-size: 18rpx; letter-spacing: 5rpx; opacity: .75; }
+.hero-title { margin-top: 22rpx; font-family: Georgia, "Songti SC", serif; font-size: 52rpx; font-weight: 600; }
+.hero-subtitle { width: 410rpx; margin-top: 18rpx; font-size: 24rpx; line-height: 1.7; opacity: .86; }
+.hero-link { margin-top: 44rpx; font-size: 22rpx; letter-spacing: 2rpx; }
+.quick-grid { display: flex; gap: 18rpx; margin-top: 20rpx; }
+.quick-item { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: center; padding: 26rpx 8rpx; border-radius: 24rpx; background: rgba(255,255,255,.72); color: #31433b; font-size: 24rpx; }
+.quick-icon { display: flex; align-items: center; justify-content: center; width: 68rpx; height: 68rpx; margin-bottom: 14rpx; border-radius: 50%; background: #e1ebe5; color: #315c4c; font-size: 19rpx; font-weight: 600; }
+.quick-ai .quick-icon { background: #315c4c; color: #fff; }
+.quick-desc { margin-top: 7rpx; color: #9a9e99; font-size: 18rpx; }
+.section { margin-top: 72rpx; }
+.featured-list { display: flex; flex-direction: column; gap: 24rpx; }
+.activity-section { padding-right: 0; }
+.activity-scroll { width: 100%; white-space: nowrap; }
+.activity-row { display: inline-flex; gap: 20rpx; padding-right: 32rpx; }
+.activity-card { position: relative; display: inline-flex; overflow: hidden; flex-direction: column; width: 480rpx; height: 260rpx; padding: 34rpx; border-radius: 28rpx; white-space: normal; }
+.activity-cream { background: #eaddc9; }
+.activity-green { background: #d5e1d8; }
+.activity-kicker { color: #8f6c46; font-size: 19rpx; letter-spacing: 3rpx; }
+.activity-title { margin-top: 14rpx; font-family: Georgia, "Songti SC", serif; font-size: 34rpx; font-weight: 600; }
+.activity-desc { margin-top: 16rpx; color: #6f756f; font-size: 22rpx; line-height: 1.55; }
+.demo-label { position: absolute; right: 20rpx; bottom: 18rpx; padding: 7rpx 14rpx; border: 1rpx solid rgba(49,92,76,.18); border-radius: 20rpx; color: #677a70; font-size: 17rpx; }
+.staff-list { display: flex; gap: 18rpx; }
+.staff-card { flex: 1; min-width: 0; text-align: center; }
+.staff-avatar { display: flex; align-items: flex-end; justify-content: center; height: 220rpx; padding-bottom: 24rpx; border-radius: 90rpx 90rpx 26rpx 26rpx; background: #dce7e0; color: rgba(49,92,76,.75); font-family: Georgia, serif; font-size: 34rpx; }
+.avatar-1 { background: #e9dfd1; }
+.avatar-2 { background: #dbe2e4; }
+.staff-name { display: block; margin-top: 18rpx; font-weight: 600; }
+.staff-intro { display: -webkit-box; overflow: hidden; margin-top: 8rpx; color: #8c918c; font-size: 20rpx; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.ai-banner { display: flex; align-items: center; margin-top: 72rpx; padding-top: 36rpx; padding-bottom: 36rpx; background: #263f36; color: #fff; }
+.ai-orb { display: flex; flex: 0 0 86rpx; align-items: center; justify-content: center; height: 86rpx; border: 1rpx solid rgba(255,255,255,.25); border-radius: 50%; background: rgba(255,255,255,.08); font-family: Georgia, serif; }
+.ai-banner-copy { flex: 1; min-width: 0; margin-left: 24rpx; }
+.ai-banner-title, .ai-banner-desc { display: block; }
+.ai-banner-title { font-size: 28rpx; font-weight: 600; }
+.ai-banner-desc { margin-top: 8rpx; color: rgba(255,255,255,.68); font-size: 21rpx; line-height: 1.55; }
+.ai-arrow { margin-left: 18rpx; font-size: 46rpx; opacity: .75; }
+.philosophy { display: flex; flex-direction: column; align-items: center; padding-top: 82rpx; padding-bottom: 50rpx; text-align: center; }
+.philosophy-kicker { color: #aa895b; font-size: 18rpx; letter-spacing: 5rpx; }
+.philosophy-title { max-width: 560rpx; margin-top: 22rpx; font-family: Georgia, "Songti SC", serif; font-size: 32rpx; line-height: 1.75; }
+.philosophy-note { margin-top: 20rpx; color: #999d98; font-size: 20rpx; }

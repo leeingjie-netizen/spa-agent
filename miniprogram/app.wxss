@@ -1,0 +1,93 @@
+page {
+  min-height: 100%;
+  background: #f7f3ea;
+  color: #25332e;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+}
+
+view,
+text,
+button,
+input,
+textarea,
+scroll-view,
+swiper,
+swiper-item,
+image {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: inherit;
+  line-height: normal;
+}
+
+button::after {
+  border: 0;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.page-content {
+  padding: 0 32rpx;
+}
+
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  border-radius: 48rpx;
+  background: #315c4c;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+
+.primary-button[disabled] {
+  background: #aebbb5;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.secondary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84rpx;
+  border: 1rpx solid #315c4c;
+  border-radius: 42rpx;
+  color: #315c4c;
+  font-weight: 600;
+}
+
+.surface-card {
+  border: 1rpx solid rgba(49, 92, 76, 0.08);
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 16rpx 46rpx rgba(42, 58, 51, 0.07);
+}
+
+.eyebrow {
+  color: #a48152;
+  font-size: 22rpx;
+  font-weight: 600;
+  letter-spacing: 4rpx;
+  text-transform: uppercase;
+}
+
+.price-symbol {
+  font-size: 22rpx;
+}
+
+.safe-bottom {
+  height: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,20 @@
+<view class="service-card {{compact ? 'is-compact' : ''}}" bindtap="handleTap">
+  <view class="service-visual visual-{{index % 4}}">
+    <view class="visual-orbit orbit-one"></view>
+    <view class="visual-orbit orbit-two"></view>
+    <text class="visual-mark">{{index % 2 === 0 ? '栖' : '心'}}</text>
+    <text class="visual-duration">{{service.durationMinutes}} MIN</text>
+  </view>
+  <view class="service-body">
+    <view class="service-tag-row">
+      <text class="service-tag">{{index < 2 ? '人气护理' : '舒缓精选'}}</text>
+      <text class="service-arrow">›</text>
+    </view>
+    <text class="service-name">{{service.name}}</text>
+    <text class="service-description">{{service.description || '以细致手法唤醒身心能量'}}</text>
+    <view class="service-footer">
+      <view class="price"><text class="currency">¥</text>{{service.price}}</view>
+      <button class="book-button" catchtap="handleBook">预约</button>
+    </view>
+  </view>
+</view>

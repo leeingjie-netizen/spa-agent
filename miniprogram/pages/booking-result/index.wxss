@@ -1,0 +1,15 @@
+.result-page { min-height: 100vh; padding: 80rpx 44rpx; text-align: center; }
+.success-mark { position: relative; width: 116rpx; height: 116rpx; margin: 0 auto; border-radius: 50%; background: #315c4c; }
+.check-line { position: absolute; height: 5rpx; border-radius: 4rpx; background: #fff; transform-origin: left center; }
+.check-line.left { top: 62rpx; left: 30rpx; width: 28rpx; transform: rotate(45deg); }
+.check-line.right { top: 77rpx; left: 50rpx; width: 52rpx; transform: rotate(-48deg); }
+.result-title { display: block; margin-top: 32rpx; font-family: Georgia, "Songti SC", serif; font-size: 44rpx; font-weight: 600; }
+.result-desc { display: block; margin-top: 12rpx; color: #898e89; font-size: 23rpx; }
+.result-card { margin: 48rpx 0 36rpx; padding: 36rpx; border-radius: 28rpx; background: #fff; box-shadow: 0 18rpx 50rpx rgba(42,58,51,.08); text-align: left; }
+.result-brand { display: flex; justify-content: space-between; color: #a17d50; font-size: 19rpx; letter-spacing: 4rpx; }
+.result-status { padding: 7rpx 16rpx; border-radius: 20rpx; background: #e4ede7; color: #315c4c; letter-spacing: 0; }
+.result-service { display: block; margin-top: 28rpx; font-family: Georgia, "Songti SC", serif; font-size: 36rpx; font-weight: 600; }
+.result-divider { height: 1rpx; margin: 30rpx 0; background: #e8ebe8; }
+.result-row { display: flex; justify-content: space-between; margin-top: 20rpx; color: #8a8f8a; font-size: 23rpx; }
+.result-row text:last-child { max-width: 420rpx; color: #36463f; text-align: right; }
+.home-button { margin: 28rpx auto 0; padding: 20rpx; color: #65746d; font-size: 24rpx; }

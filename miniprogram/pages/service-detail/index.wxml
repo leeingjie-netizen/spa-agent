@@ -1,0 +1,48 @@
+<view class="detail-page">
+  <status-view wx:if="{{loading}}" type="loading" title="正在准备服务详情"></status-view>
+  <status-view wx:elif="{{errorMessage}}" type="error" title="服务详情加载失败" description="{{errorMessage}}" actionText="重新加载" bind:action="loadService"></status-view>
+
+  <block wx:elif="{{service}}">
+    <view class="detail-hero">
+      <view class="hero-orbit orbit-one"></view>
+      <view class="hero-orbit orbit-two"></view>
+      <text class="hero-eyebrow">SIGNATURE TREATMENT</text>
+      <text class="hero-mark">栖</text>
+      <view class="hero-duration"><text>{{service.durationMinutes}}</text><text class="duration-unit">分钟</text></view>
+    </view>
+
+    <view class="detail-content">
+      <view class="title-row">
+        <view class="title-copy"><text class="service-name">{{service.name}}</text><text class="service-tagline">专业护理 · 专属时光</text></view>
+        <view class="service-price"><text class="currency">¥</text>{{service.price}}</view>
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="content-section">
+        <text class="section-eyebrow">ABOUT</text>
+        <text class="section-title">护理介绍</text>
+        <text class="description">{{service.description || '以细致专业的护理手法，帮助身体回到放松与平衡的状态。'}}</text>
+      </view>
+
+      <view class="benefit-grid">
+        <view class="benefit-item"><text class="benefit-index">01</text><text class="benefit-title">深度放松</text><text class="benefit-desc">释放日常积累的紧张与疲惫</text></view>
+        <view class="benefit-item"><text class="benefit-index">02</text><text class="benefit-title">专属方案</text><text class="benefit-desc">由技师结合现场沟通进行护理</text></view>
+      </view>
+
+      <view class="content-section notice-section">
+        <text class="section-eyebrow">BEFORE YOU ARRIVE</text>
+        <text class="section-title">预约须知</text>
+        <view class="notice-item" wx:for="{{bookingNotices}}" wx:key="index"><text class="notice-dot"></text><text>{{item}}</text></view>
+      </view>
+
+      <button class="ai-helper" bindtap="goToAi"><text class="ai-badge">AI</text><view><text class="ai-title">让智能顾问帮你规划</text><text class="ai-desc">携带当前服务进入对话</text></view><text class="ai-arrow">›</text></button>
+    </view>
+
+    <view class="booking-bar">
+      <view class="booking-price"><text class="price-label">预约价</text><text><text class="currency">¥</text>{{service.price}}</text></view>
+      <button class="book-now" bindtap="goToBooking">选择技师与时间</button>
+      <view class="safe-bottom"></view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,10 @@
+.status-view { display: flex; flex-direction: column; align-items: center; padding: 96rpx 48rpx; text-align: center; }
+.status-art { position: relative; width: 116rpx; height: 116rpx; margin-bottom: 30rpx; border-radius: 50%; background: #e5ede7; }
+.status-art-inner { position: absolute; top: 26rpx; left: 31rpx; width: 50rpx; height: 58rpx; border: 4rpx solid #648272; border-radius: 24rpx 24rpx 30rpx 30rpx; transform: rotate(15deg); }
+.status-error { background: #f6e7df; }
+.status-error .status-art-inner { border-color: #b56c55; }
+.status-loading { animation: breathe 1.4s ease-in-out infinite; }
+.status-title { color: #2a3832; font-size: 30rpx; font-weight: 600; }
+.status-description { max-width: 520rpx; margin-top: 14rpx; color: #858981; font-size: 24rpx; line-height: 1.7; }
+.status-action { margin-top: 28rpx; padding: 18rpx 36rpx; border: 1rpx solid #315c4c; border-radius: 38rpx; color: #315c4c; font-size: 24rpx; }
+@keyframes breathe { 0%, 100% { opacity: 0.55; transform: scale(0.94); } 50% { opacity: 1; transform: scale(1); } }

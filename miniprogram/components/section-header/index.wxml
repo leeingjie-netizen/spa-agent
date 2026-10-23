@@ -1,0 +1,7 @@
+<view class="section-header">
+  <view>
+    <text wx:if="{{eyebrow}}" class="section-eyebrow">{{eyebrow}}</text>
+    <text class="section-title">{{title}}</text>
+  </view>
+  <button wx:if="{{actionText}}" class="section-action" bindtap="handleAction">{{actionText}} <text>›</text></button>
+</view>

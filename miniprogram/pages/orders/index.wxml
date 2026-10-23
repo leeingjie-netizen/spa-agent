@@ -1,0 +1,49 @@
+<view class="page-shell orders-page">
+  <view class="orders-header page-content">
+    <text class="header-eyebrow">MY APPOINTMENTS</text>
+    <text class="header-title">订单与预约</text>
+    <text class="header-desc">当前订单数据来自预约系统；支付状态尚未接入</text>
+  </view>
+
+  <scroll-view class="tab-scroll" scroll-x show-scrollbar="{{false}}">
+    <view class="tab-row">
+      <button wx:for="{{tabs}}" wx:key="key" class="status-tab {{activeTab === item.key ? 'is-active' : ''}}" data-key="{{item.key}}" bindtap="selectTab">{{item.label}}</button>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{activeTab === 'unpaid' || activeTab === 'inService'}}" class="capability-note page-content">
+    <text class="note-title">{{activeTab === 'unpaid' ? '支付状态尚未接入' : '服务中状态尚未接入'}}</text>
+    <text class="note-desc">当前 appointment 仅包含预约履约状态，这里保留产品结构，不编造订单数据。</text>
+  </view>
+
+  <view class="page-content order-content">
+    <status-view wx:if="{{loading}}" type="loading" title="正在读取预约"></status-view>
+    <status-view wx:elif="{{errorMessage}}" type="error" title="预约加载失败" description="{{errorMessage}}" actionText="重新加载" bind:action="loadAppointments"></status-view>
+    <status-view wx:elif="{{filteredAppointments.length === 0}}" title="这里还没有订单" description="预约一项护理，给自己留出放松时间" actionText="浏览服务" bind:action="goToServices"></status-view>
+
+    <view wx:else class="order-list">
+      <view class="order-card" wx:for="{{filteredAppointments}}" wx:key="appointmentId">
+        <view class="order-head">
+          <text class="order-no">{{item.appointmentNo}}</text>
+          <text class="status-pill status-{{item.statusTone}}">{{item.statusLabel}}</text>
+        </view>
+        <view class="order-main" data-id="{{item.appointmentId}}" bindtap="viewDetail">
+          <view class="order-art"><text>栖</text></view>
+          <view class="order-copy">
+            <text class="service-name">{{item.serviceName || '服务信息待补充'}}</text>
+            <text class="order-meta">{{item.appointmentDate}} · {{item.startTimeDisplay}}-{{item.endTimeDisplay}}</text>
+            <text class="order-meta">护理技师 {{item.staffName || item.staffId}}</text>
+          </view>
+          <text class="order-price">¥{{item.amount}}</text>
+        </view>
+        <view class="order-actions">
+          <button class="text-button" data-id="{{item.appointmentId}}" bindtap="viewDetail">查看详情</button>
+          <button wx:if="{{item.status === 2 || item.status === 3}}" class="outline-button" data-service-id="{{item.serviceId}}" bindtap="rebook">再次预约</button>
+          <button wx:if="{{activeTab === 'unpaid'}}" class="solid-button" bindtap="requestPayment">去支付</button>
+          <button wx:if="{{item.cancellable}}" class="outline-button danger" loading="{{cancellingId === item.appointmentId}}" data-id="{{item.appointmentId}}" bindtap="confirmCancel">取消预约</button>
+          <text wx:elif="{{item.cancelReason && item.status !== 3}}" class="cancel-reason">{{item.cancelReason}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
