@@ -21,7 +21,7 @@
 
   <view class="service-count page-content" wx:if="{{!loading && !errorMessage}}">
     <text>{{filteredServices.length}} 项护理</text>
-    <text class="count-note">真实服务数据</text>
+    <picker range="{{sortLabels}}" value="{{sortIndex}}" bindchange="selectSort"><text class="count-note">{{sortLabels[sortIndex]}} ⌄</text></picker>
   </view>
 
   <view class="page-content">
@@ -30,7 +30,7 @@
     <status-view wx:elif="{{filteredServices.length === 0}}" title="没有找到匹配的服务" description="换一个关键词或分类试试"></status-view>
     <view wx:else class="service-grid">
       <view wx:for="{{filteredServices}}" wx:key="id" class="service-cell">
-        <service-card service="{{item}}" index="{{index}}" bind:select="goToDetail" bind:book="goToBooking"></service-card>
+        <service-card service="{{item}}" index="{{index}}" compact bind:select="goToDetail" bind:book="goToBooking"></service-card>
       </view>
     </view>
   </view>

@@ -1,4 +1,3 @@
-
 {
   "pages": [
     "pages/home/index",
@@ -9,7 +8,11 @@
     "pages/booking/index",
     "pages/booking-result/index",
     "pages/order-detail/index",
-    "pages/ai-chat/index"
+    "pages/ai-chat/index",
+    "pages/login/index",
+    "pages/points/index",
+    "pages/review/index",
+    "pages/benefits/index"
   ],
   "window": {
     "navigationBarTitleText": "栖心 SPA",
@@ -24,10 +27,22 @@
     "selectedColor": "#315C4C",
     "backgroundColor": "#FFFFFF",
     "list": [
-      { "pagePath": "pages/home/index", "text": "首页" },
-      { "pagePath": "pages/services/index", "text": "服务" },
-      { "pagePath": "pages/orders/index", "text": "订单" },
-      { "pagePath": "pages/profile/index", "text": "我的" }
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/services/index",
+        "text": "服务"
+      },
+      {
+        "pagePath": "pages/orders/index",
+        "text": "订单"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
     ]
   },
   "usingComponents": {

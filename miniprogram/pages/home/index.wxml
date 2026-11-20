@@ -3,7 +3,7 @@
     <view>
       <text class="brand-kicker">QI XIN WELLNESS</text>
       <text class="brand-title">栖心</text>
-      <text class="brand-greeting">下午好，给自己一段松弛时光</text>
+      <text class="brand-greeting">{{greeting}}</text>
     </view>
     <button class="ai-mini" bindtap="goToAi"><text class="ai-spark">✦</text><text>AI 顾问</text></button>
   </view>
@@ -25,28 +25,32 @@
 
   <view class="quick-grid page-content">
     <button class="quick-item" bindtap="goToServices"><view class="quick-icon">预约</view><text>预约护理</text><text class="quick-desc">选择服务与时间</text></button>
-    <button class="quick-item" bindtap="goToServices"><view class="quick-icon">甄选</view><text>热门服务</text><text class="quick-desc">查看人气护理</text></button>
+    <button class="quick-item" bindtap="goToServices"><view class="quick-icon">甄选</view><text>热门服务</text><text class="quick-desc">查看护理清单</text></button>
     <button class="quick-item quick-ai" bindtap="goToAi"><view class="quick-icon">AI</view><text>智能推荐</text><text class="quick-desc">一句话匹配方案</text></button>
   </view>
 
   <view class="section page-content">
-    <section-header eyebrow="CURATED FOR YOU" title="今日精选" actionText="全部服务" bind:action="goToServices"></section-header>
+    <section-header eyebrow="CURATED FOR YOU" title="护理甄选" actionText="全部服务" bind:action="goToServices"></section-header>
     <status-view wx:if="{{loading}}" type="loading" title="正在准备护理清单"></status-view>
     <status-view wx:elif="{{errorMessage}}" type="error" title="暂时无法获取服务" description="{{errorMessage}}" actionText="重新加载" bind:action="loadHomeData"></status-view>
+    <status-view wx:elif="{{!services.length}}" title="护理菜单准备中" description="门店配置服务后会在这里展示"></status-view>
     <view wx:else class="featured-list">
       <service-card wx:for="{{services}}" wx:key="id" service="{{item}}" index="{{index}}" compact bind:select="goToServiceDetail" bind:book="goToBooking"></service-card>
     </view>
   </view>
 
-  <view class="section activity-section page-content">
-    <section-header eyebrow="SEASONAL NOTES" title="本月灵感"></section-header>
+  <view wx:if="{{contentError}}" class="page-content"><status-view type="error" title="门店动态加载失败" description="{{contentError}}" actionText="重试" bind:action="loadContent"></status-view></view>
+  <view wx:if="{{activities.length}}" class="section activity-section page-content">
+    <section-header eyebrow="SEASONAL NOTES" title="门店动态"></section-header>
     <scroll-view class="activity-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="activity-row">
         <view wx:for="{{activities}}" wx:key="id" class="activity-card activity-{{item.theme}}">
-          <text class="activity-kicker">{{item.kicker}}</text>
+          <view wx:if="{{item.imageUrl && !item.imageFailed}}" class="activity-media"><image class="activity-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load data-id="{{item.id}}" binderror="handleActivityImageError" /></view>
+          <text wx:elif="{{item.imageFailed}}" class="activity-image-error">图片暂时无法加载，请刷新重试</text>
+          <text class="activity-kicker">栖心 · 护理动态</text>
           <text class="activity-title">{{item.title}}</text>
           <text class="activity-desc">{{item.description}}</text>
-          <text class="demo-label">展示内容</text>
+
         </view>
       </view>
     </scroll-view>

@@ -17,3 +17,5 @@
 .detail-actions { display: flex; gap: 18rpx; margin-top: 30rpx; }
 .detail-actions button { flex: 1; }
 .cancel-button { display: flex; align-items: center; justify-content: center; height: 96rpx; border: 1rpx solid #a57365; border-radius: 48rpx; color: #955d4d; font-size: 27rpx; font-weight: 600; }
+
+.benefit-form {padding:28rpx;margin:24rpx 32rpx;border-radius:24rpx;background:#fff;}.benefit-title {display:block;font-size:29rpx;font-weight:600;color:#315c4c;}.benefit-description {display:block;margin:14rpx 0;font-size:22rpx;line-height:1.7;color:#8b907f;}.benefit-picker,.benefit-points {margin:24rpx 0;padding:22rpx 0;border-bottom:1rpx solid #e2e7da;font-size:25rpx;color:#53664f;}.benefit-points {width:100%;height:88rpx;min-height:88rpx;padding:0 16rpx;}

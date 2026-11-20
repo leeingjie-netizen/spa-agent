@@ -22,7 +22,7 @@
     </view>
 
     <view class="booking-section">
-      <view class="section-heading"><text class="step-number">02</text><view><text class="section-title">选择到店日期</text><text class="section-desc">可查看未来 10 天的排班</text></view></view>
+      <view class="section-heading"><text class="step-number">02</text><view><text class="section-title">选择到店日期</text><text class="section-desc">可查看未来 30 天的排班</text></view></view>
       <scroll-view class="date-scroll" scroll-x show-scrollbar="{{false}}">
         <view class="date-row">
           <button wx:for="{{dateOptions}}" wx:key="value" class="date-option {{selectedDate === item.value ? 'is-selected' : ''}}" data-date="{{item.value}}" bindtap="selectDate"><text class="date-week">{{item.week}}</text><text class="date-value">{{item.monthDay}}</text></button>
@@ -31,9 +31,10 @@
     </view>
 
     <view class="booking-section">
-      <view class="section-heading"><text class="step-number">03</text><view><text class="section-title">选择开始时间</text><text class="section-desc">可用时段由排班与已占用 Slot 实时计算</text></view></view>
+      <view class="section-heading"><text class="step-number">03</text><view><text class="section-title">选择开始时间</text><text class="section-desc">午休、请假及停业时段将自动排除，以实时查询为准</text></view></view>
       <status-view wx:if="{{!selectedStaffId}}" title="请先选择技师" description="选择技师后会自动查询可预约时段"></status-view>
       <status-view wx:elif="{{slotsLoading}}" type="loading" title="正在查询可用时段"></status-view>
+      <status-view wx:elif="{{slotsError}}" type="error" title="时段查询失败" description="{{slotsError}}" actionText="重新查询" bind:action="loadSlots"></status-view>
       <status-view wx:elif="{{slots.length === 0}}" title="当天暂无可用时段" description="请尝试其他日期或技师"></status-view>
       <view wx:else class="slot-grid">
         <button wx:for="{{slots}}" wx:key="*this" class="slot-option {{selectedTime === item ? 'is-selected' : ''}}" data-time="{{item}}" bindtap="selectTime">{{item}}</button>
@@ -48,7 +49,7 @@
 
     <view class="submit-bar">
       <view class="submit-price"><text class="submit-label">应付金额</text><text>¥{{service.price}}</text></view>
-      <button class="submit-button" disabled="{{!selectedStaffId || !selectedTime || submitting}}" loading="{{submitting}}" bindtap="submitBooking">{{submitting ? '提交中' : '确认预约'}}</button>
+      <button class="submit-button" disabled="{{!selectedStaffId || !selectedTime || slotsLoading || submitting}}" loading="{{submitting}}" bindtap="submitBooking">{{submitting ? '提交中' : '确认预约'}}</button>
     </view>
   </block>
 </view>

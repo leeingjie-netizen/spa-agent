@@ -25,12 +25,16 @@ public class AiChatServiceImpl implements AiChatService {
     private final AppointmentTool appointmentTool;
 
     private final StaffTool staffTool;
+    private final com.lee.spa.config.AiRuntimeConfiguration aiConfiguration;
 
     public AiChatServiceImpl(ChatClient.Builder builder,
                              SpaServiceTool spaServiceTool,
                              AppointmentTool appointmentTool,
                              StaffTool staffTool,
-                             ChatMemory chatMemory) {
+                             ChatMemory chatMemory,
+                             com.lee.spa.config.AiRuntimeConfiguration aiConfiguration) {
+
+        this.aiConfiguration = aiConfiguration;
 
         String systemPrompt = """
                 你是SPA预约助手，严格遵守下面【创建预约规则】，不可擅自跳过步骤：
@@ -99,12 +103,20 @@ public class AiChatServiceImpl implements AiChatService {
 
     @Override
     public String chat(String conversationId, String requestId, String message) {
+        Long currentUser = com.lee.spa.auth.AuthContext.requireUserId();
+        if (conversationId == null || !conversationId.matches("[a-zA-Z0-9_-]{1,80}")
+                || requestId == null || requestId.isBlank() || requestId.length() > 50
+                || message == null || message.isBlank() || message.length() > 4000) {
+            throw new com.lee.spa.common.exception.BusinessException("会话、请求标识或消息内容不合法");
+        }
+        String privateConversationId = currentUser + ":" + conversationId;
+        if (!aiConfiguration.configured()) throw new com.lee.spa.common.exception.BusinessException("智能顾问尚未配置，请先使用服务页面预约");
 
         log.info(
-                "AI Chat 请求：conversationId={}, requestId={}, message={}",
+                "AI Chat 请求：conversationId={}, requestId={}, messageLength={}",
                 conversationId,
                 requestId,
-                message
+                message.length()
         );
 
         return chatClient.prompt()
@@ -112,7 +124,7 @@ public class AiChatServiceImpl implements AiChatService {
                 //意思是：本次请求属于 conversationId 对应的聊天记录。
                 .advisors(advisor -> advisor.param(
                         ChatMemory.CONVERSATION_ID,
-                        conversationId
+                        privateConversationId
                 ))
                 .tools(spaServiceTool,
                         appointmentTool,
@@ -122,7 +134,9 @@ public class AiChatServiceImpl implements AiChatService {
                 // 这些上下文不会作为 Tool 参数提供给模型。
                 .toolContext(
                         Map.of("requestId", requestId,
-                        "userId",1L
+                        "userId",currentUser,
+                        "bookingConfirmed", message.strip().matches("确认预约[。！!]?"),
+                        "cancellationConfirmed", message.strip().matches("确认取消[。！!]?")
                         )
                 )
                 .call()

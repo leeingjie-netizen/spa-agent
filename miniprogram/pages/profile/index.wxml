@@ -3,22 +3,23 @@
     <text class="header-eyebrow">MEMBER CENTRE</text>
     <view class="user-row">
       <view class="avatar"><text>栖</text></view>
-      <view class="user-copy"><text class="user-name">{{user.nickname}}</text><text class="user-note">开发演示账户 · userId {{user.id}}</text></view>
+      <view class="user-copy" bindtap="login"><text class="user-name">{{user ? user.nickname : '欢迎来到栖心'}}</text><text class="user-note">{{user ? modeLabel : '登录，开启专属护理时光'}}</text></view>
       <button class="settings-button" bindtap="showEnvironment">···</button>
     </view>
 
-    <view class="member-card">
+    <view class="member-card" bindtap="goMembership">
       <view class="card-orbit orbit-one"></view><view class="card-orbit orbit-two"></view>
       <text class="member-eyebrow">QI XIN MEMBER</text>
       <text class="member-title">身心养护计划</text>
-      <text class="member-status">会员体系未开通</text>
-      <text class="member-number">DEMO · {{user.id}}</text>
+      <text class="member-status">查看我的等级与积分 →</text>
+      <text class="member-number">QI XIN WELLNESS</text>
     </view>
   </view>
 
   <view class="asset-grid">
-    <button wx:for="{{assetItems}}" wx:key="key" class="asset-item" data-label="{{item.label}}" bindtap="handleAsset"><text class="asset-value">{{item.value}}</text><text class="asset-label">{{item.label}}</text></button>
+    <button wx:for="{{assetItems}}" wx:key="key" class="asset-item" data-key="{{item.key}}" data-label="{{item.label}}" bindtap="handleAsset"><text class="asset-value">{{item.value}}</text><text class="asset-label">{{item.label}}</text></button>
   </view>
+  <text class="wallet-disclaimer">测试余额仅用于开发体验，不代表真实资金。</text>
 
   <view class="appointment-entry" bindtap="goToOrders">
     <view class="entry-icon"><view class="calendar-line"></view></view>
@@ -36,5 +37,7 @@
     </button>
   </view>
 
+  <button wx:if="{{user}}" class="logout-button" bindtap="logout">退出登录</button>
+  <button wx:else class="primary-button profile-login" bindtap="login">登录栖心</button>
   <view class="profile-note"><text>栖心 SPA · 让每一次停留都有意义</text><text>账户与资产信息最终以服务端为准</text></view>
 </view>

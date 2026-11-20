@@ -25,4 +25,17 @@ public class StaffSchedule {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    /**
+     * AUTO：自动生成
+     * MANUAL：管理员手工维护
+     */
+    private String source;
+
+    /**
+     * 当天午休时间
+     */
+    private LocalTime breakStartTime;
+
+    private LocalTime breakEndTime;
 }

@@ -1,8 +1,8 @@
 <view class="result-page">
   <block wx:if="{{result}}">
     <view class="success-mark"><view class="check-line left"></view><view class="check-line right"></view></view>
-    <text class="result-title">预约已提交</text>
-    <text class="result-desc">系统已完成时段占用，请按预约时间到店</text>
+    <text class="result-title">预约已确认</text>
+    <text class="result-desc">时段已为你保留，请在订单中查看履约与支付状态</text>
 
     <view class="result-card">
       <view class="result-brand"><text>QI XIN</text><text class="result-status">已预约</text></view>

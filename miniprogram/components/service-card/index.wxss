@@ -23,3 +23,8 @@
 .is-compact .service-visual { flex: 0 0 210rpx; height: 250rpx; }
 .is-compact .service-body { flex: 1; min-width: 0; }
 .is-compact .visual-mark { font-size: 110rpx; }
+.price, .book-button { white-space: nowrap; flex-shrink: 0; }
+.book-button { width: 136rpx; flex: 0 0 136rpx; padding: 15rpx 0; }
+.is-compact .service-visual { align-self: stretch; height: auto; min-height: 280rpx; }
+
+.service-photo {position:absolute;inset:0;width:100%;height:100%;}.service-name {overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;}.service-description {display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}.service-visual .visual-duration {padding:6rpx 12rpx;border-radius:20rpx;background:rgba(247,243,234,.86);}

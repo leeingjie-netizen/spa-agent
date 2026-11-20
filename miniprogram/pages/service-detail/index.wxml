@@ -4,6 +4,7 @@
 
   <block wx:elif="{{service}}">
     <view class="detail-hero">
+      <image wx:if="{{service.coverUrl && !imageFailed}}" class="detail-photo" src="{{service.coverUrl}}" mode="aspectFill" lazy-load binderror="imageError" />
       <view class="hero-orbit orbit-one"></view>
       <view class="hero-orbit orbit-two"></view>
       <text class="hero-eyebrow">SIGNATURE TREATMENT</text>
@@ -22,12 +23,13 @@
       <view class="content-section">
         <text class="section-eyebrow">ABOUT</text>
         <text class="section-title">护理介绍</text>
-        <text class="description">{{service.description || '以细致专业的护理手法，帮助身体回到放松与平衡的状态。'}}</text>
+        <text class="description">{{service.description || '详细介绍暂未配置，可向门店或智能顾问咨询。'}}</text>
       </view>
 
-      <view class="benefit-grid">
-        <view class="benefit-item"><text class="benefit-index">01</text><text class="benefit-title">深度放松</text><text class="benefit-desc">释放日常积累的紧张与疲惫</text></view>
-        <view class="benefit-item"><text class="benefit-index">02</text><text class="benefit-title">专属方案</text><text class="benefit-desc">由技师结合现场沟通进行护理</text></view>
+      <view class="content-section therapist-section">
+        <text class="section-eyebrow">YOUR THERAPISTS</text><text class="section-title">可选护理技师</text>
+        <view wx:for="{{staffList}}" wx:key="id" class="detail-therapist"><view class="therapist-initial">{{item.name}}</view><view><text class="therapist-name">{{item.name}}</text><text class="therapist-intro">{{item.introduction || '选择时间后可查看实时排班'}}</text></view></view>
+        <text wx:if="{{!staffList.length}}" class="description">暂无可预约技师，请稍后再来。</text>
       </view>
 
       <view class="content-section notice-section">

@@ -1,5 +1,8 @@
+const { requireLogin } = require('../../utils/session')
 const { sendChatMessage } = require('../../api/ai')
 const { createClientId } = require('../../utils/id')
+const { renderMarkdown } = require('../../utils/markdown')
+const assistant = (id, content) => ({ id, role: 'assistant', content, nodes: renderMarkdown(content) })
 
 const suggestions = [
   '100 元以内有什么肩颈护理？',
@@ -10,8 +13,10 @@ const suggestions = [
 Page({
   data: {
     messages: [],
+    keyboardHeight: 0,
     suggestions,
     inputValue: '',
+    hasInput: false,
     conversationId: '',
     sending: false,
     scrollIntoView: '',
@@ -34,20 +39,23 @@ Page({
     this.setData({
       conversationId,
       contextPrompt,
-      messages: [{ id: 'welcome', role: 'assistant', content: `你好，我是栖心智能预约顾问。${contextText}` }]
+      messages: [assistant('welcome', `你好，我是栖心智能预约顾问。${contextText}`)]
     })
   },
 
   handleInput(event) {
-    this.setData({ inputValue: event.detail.value })
+    this.setData({ inputValue: event.detail.value, hasInput: !!event.detail.value.trim() })
   },
 
   useSuggestion(event) {
-    this.setData({ inputValue: event.currentTarget.dataset.text })
+    this.setData({ inputValue: event.currentTarget.dataset.text, hasInput: true })
     this.sendMessage()
   },
 
+  keyboardChanged(event) { this.setData({ keyboardHeight: event.detail.height || 0 }); this.scrollToBottom() },
+
   sendMessage() {
+    if (!requireLogin()) return
     const content = this.data.inputValue.trim()
     if (!content || this.data.sending) return
 
@@ -55,6 +63,7 @@ Page({
     this.setData({
       messages: [...this.data.messages, userMessage],
       inputValue: '',
+      hasInput: false,
       sending: true,
       retryContent: ''
     })
@@ -65,13 +74,18 @@ Page({
   async requestAnswer(content) {
     try {
       const answer = await sendChatMessage({
-        message: this.data.contextPrompt ? `${this.data.contextPrompt}\n用户问题：${content}` : content,
+        message: this.data.contextPrompt && !/^确认(预约|取消)[。！!]?$/.test(content) ? `${this.data.contextPrompt}\n用户问题：${content}` : content,
         conversationId: this.data.conversationId,
         requestId: createClientId('ai-request')
       })
-      const assistantMessage = { id: createClientId('assistant'), role: 'assistant', content: answer }
+      if (this._unloaded) return
+      const text = typeof answer === 'string' ? answer : answer && answer.message
+      if (!text) throw new Error('智能顾问未返回有效回复，请稍后重试')
+      if (typeof answer !== 'string' || !answer.trim()) throw new Error('智能顾问暂未返回内容，请稍后重试')
+      const assistantMessage = assistant(createClientId('assistant'), text)
       this.setData({ messages: [...this.data.messages, assistantMessage] })
     } catch (error) {
+      if (this._unloaded) return
       const errorMessage = {
         id: createClientId('error'),
         role: 'error',
@@ -79,6 +93,7 @@ Page({
       }
       this.setData({ messages: [...this.data.messages, errorMessage], retryContent: content })
     } finally {
+      if (this._unloaded) return
       this.setData({ sending: false })
       this.scrollToBottom()
     }
@@ -92,7 +107,10 @@ Page({
     this.requestAnswer(content)
   },
 
+  onUnload() { this._unloaded = true; clearTimeout(this._scrollTimer) },
+
   newConversation() {
+    if (this.data.sending) return
     wx.showModal({
       title: '开始新对话？',
       content: '当前页面消息会被清空，并创建新的会话上下文。',
@@ -102,7 +120,7 @@ Page({
         wx.setStorageSync('aiConversationId', conversationId)
         this.setData({
           conversationId,
-          messages: [{ id: 'welcome-new', role: 'assistant', content: '新的对话已开始。告诉我你想预约的服务、日期或预算吧。' }],
+          messages: [assistant('welcome-new', '新的对话已开始。告诉我你想预约的服务、日期或预算吧。')],
           retryContent: ''
         })
       }
@@ -111,6 +129,7 @@ Page({
 
   scrollToBottom() {
     this.setData({ scrollIntoView: '' })
-    setTimeout(() => this.setData({ scrollIntoView: 'message-bottom' }), 30)
+    clearTimeout(this._scrollTimer)
+    this._scrollTimer = setTimeout(() => this.setData({ scrollIntoView: 'message-bottom' }), 30)
   }
 })

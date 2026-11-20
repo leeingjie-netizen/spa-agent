@@ -1,8 +1,10 @@
 <view class="detail-page">
-  <block wx:if="{{order}}">
+  <status-view wx:if="{{loading}}" type="loading" title="正在读取最新预约"></status-view>
+  <status-view wx:elif="{{errorMessage}}" type="error" title="预约读取失败" description="{{errorMessage}}" actionText="重新加载" bind:action="loadOrder"></status-view>
+  <block wx:elif="{{order}}">
     <view class="status-hero status-{{order.statusTone}}">
       <text class="status-label">{{order.statusLabel}}</text>
-      <text class="status-desc">{{order.cancellable ? '当前预约符合预取消条件' : (order.cancelReason || '请以订单实际状态为准')}}</text>
+      <text class="status-desc">{{order.statusDescription}}</text>
     </view>
 
     <view class="detail-card">
@@ -11,19 +13,31 @@
       <view class="info-row"><text>预约日期</text><text>{{order.appointmentDate}}</text></view>
       <view class="info-row"><text>预约时间</text><text>{{order.startTimeDisplay}} - {{order.endTimeDisplay}}</text></view>
       <view class="info-row"><text>护理技师</text><text>{{order.staffName}}</text></view>
-      <view class="info-row"><text>预约金额</text><text>¥{{order.amount}}</text></view>
-      <view class="info-row"><text>预约编号</text><text>{{order.appointmentNo}}</text></view>
+      <view wx:if="{{order.originalAmount != null}}" class="info-row"><text>服务原价</text><text>¥{{order.originalAmount}}</text></view>
+      <view wx:if="{{order.discountAmount > 0}}" class="info-row"><text>优惠合计</text><text>-¥{{order.discountAmount}}</text></view>
+      <view wx:if="{{order.pointsUsed > 0}}" class="info-row"><text>本单使用积分</text><text>{{order.pointsUsed}} 积分</text></view>
+      <view class="info-row"><text>订单金额</text><text>¥{{order.amount}}</text></view>
+      <view class="info-row"><text>订单编号</text><text>{{order.orderNo}}</text></view>
     </view>
 
+    <view wx:if="{{order.canPay}}" class="benefit-form">
+      <text class="benefit-title">使用护理权益</text><text class="benefit-description">确认后由服务端校验归属、门槛与有效期</text>
+      <picker range="{{couponLabels}}" value="{{couponIndex}}" bindchange="selectCoupon"><view class="benefit-picker">{{couponLabels[couponIndex]}} ⌄</view></picker>
+      <input class="benefit-points" type="number" value="{{points}}" bindinput="inputPoints" placeholder="使用积分（100积分抵1元）" maxlength="7" />
+      <button class="secondary-button" loading="{{applying}}" disabled="{{applying || paying}}" bindtap="applyBenefits">确认优惠并更新金额</button><text wx:if="{{benefitNote}}" class="benefit-description">{{benefitNote}}</text>
+      <picker wx:if="{{mockPayment}}" range="{{paymentChoices}}" value="{{paymentIndex}}" bindchange="selectPayment"><view class="benefit-picker">测试渠道：{{paymentChoices[paymentIndex]}} ⌄</view></picker>
+    </view>
     <view class="payment-card">
-      <view><text class="payment-title">支付信息</text><text class="payment-desc">现有后端未区分支付状态，正式支付尚未接入</text></view>
-      <text class="pending-badge">待开发</text>
+      <view><text class="payment-title">支付信息</text><text class="payment-desc">{{order.paymentLabel}}</text></view>
+      <text class="pending-badge">{{order.paymentStatusLabel}}</text>
     </view>
 
     <view class="detail-actions">
+      <button wx:if="{{order.status === 'COMPLETED'}}" class="secondary-button" bindtap="review">分享护理体验</button>
       <button wx:if="{{order.cancellable}}" class="cancel-button" loading="{{cancelling}}" bindtap="confirmCancel">取消预约</button>
-      <button wx:if="{{order.status === 2 || order.status === 3}}" class="primary-button" bindtap="rebook">再次预约</button>
-      <button wx:if="{{order.status === 0}}" class="primary-button" bindtap="showPaymentNotice">支付能力待接入</button>
+      <button wx:if="{{order.status === 'COMPLETED' || order.status === 'CANCELLED'}}" class="primary-button" bindtap="rebook">再次预约</button>
+      <button wx:if="{{order.canPay && mockPayment}}" class="primary-button" loading="{{paying}}" disabled="{{paying}}" bindtap="pay">开发模拟支付 · 不扣款</button>
+      <text wx:elif="{{order.canPay}}" class="payment-desc">真实支付暂不可用，请联系门店</text>
     </view>
   </block>
   <status-view wx:else type="error" title="订单信息不存在" description="请返回订单列表重新选择"></status-view>

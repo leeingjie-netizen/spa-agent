@@ -1,4 +1,8 @@
 {
-  "desc": "SPA 预约小程序",
-  "rules": []
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
 }

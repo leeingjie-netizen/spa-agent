@@ -1,0 +1,8 @@
+.login-page { min-height:100vh; padding:80rpx 56rpx calc(48rpx + env(safe-area-inset-bottom)); background:#f7f3ea; }
+.brand-seal {display:flex;align-items:center;justify-content:center;width:110rpx;height:110rpx;margin-bottom:40rpx;border:1rpx solid #b7c6b9;border-radius:55rpx;color:#315c4c;font:64rpx Georgia,serif;background:#e6eadf;}
+.login-title {display:block;margin:24rpx 0;color:#25332e;font-size:52rpx;font-weight:600;letter-spacing:3rpx;}
+.login-subtitle {display:block;white-space:pre-wrap;color:#737b73;font-size:27rpx;line-height:1.9;}
+.login-benefits {margin:64rpx 0;padding:12rpx 0;border-top:1rpx solid #dce1d7;border-bottom:1rpx solid #dce1d7;}.login-benefits view {display:flex;gap:24rpx;padding:22rpx 0;font-size:25rpx;color:#43564b;}.login-benefits view text:first-child {color:#a48152;font-size:22rpx;}
+.browse-button {width:100%;padding:28rpx;color:#677b6f;font-size:26rpx;}.privacy-note {display:block;margin-top:24rpx;color:#8d938a;text-align:center;white-space:pre-wrap;font-size:22rpx;line-height:1.8;}
+
+.dev-login {margin-top:24rpx;padding:24rpx;border-radius:24rpx;background:#eae9df;}.dev-login text {display:block;font-size:22rpx;color:#84745c;margin:12rpx 0;}.dev-login input {height:88rpx;min-height:88rpx;width:100%;margin:20rpx 0;padding:0 20rpx;border:1rpx solid #cbd2c7;border-radius:16rpx;background:#fffdf8;font-size:26rpx;}

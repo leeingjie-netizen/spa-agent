@@ -91,3 +91,12 @@ button::after {
 .safe-bottom {
   height: env(safe-area-inset-bottom);
 }
+
+/* Brand tokens shared by all native pages. */
+page { --brand:#315c4c; --ink:#25332e; --muted:#778075; --paper:#f7f3ea; --surface:#fff; --accent:#a48152; --danger:#9b5e4a; --radius:28rpx; --space:24rpx; }
+button { transition: opacity .15s; } button:active { opacity:.78; }
+text { overflow-wrap:anywhere; }
+.inline-error {display:block;margin:20rpx 0;padding:22rpx 24rpx;border-radius:18rpx;background:#f4e7e1;color:#8f5545;font-size:24rpx;line-height:1.7;}
+.status-pill {padding:8rpx 18rpx;border-radius:24rpx;background:#e6eee7;color:#315c4c;font-size:21rpx;}
+.surface-card {box-shadow:0 8rpx 24rpx rgba(42,58,51,.035);}
+@media (prefers-reduced-motion: reduce) { button {transition:none;} }

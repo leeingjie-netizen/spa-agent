@@ -11,8 +11,15 @@ Component({
   methods: {
     switchTab(event) {
       const { path, index } = event.currentTarget.dataset
-      this.setData({ selected: Number(index) })
-      wx.switchTab({ url: path })
+      const previous = this.data.selected
+      wx.switchTab({
+        url: path,
+        success: () => this.setData({ selected: Number(index) }),
+        fail: () => {
+          this.setData({ selected: previous })
+          wx.showToast({ title: '页面暂时无法打开，请重试', icon: 'none' })
+        }
+      })
     }
   }
 })

@@ -9,6 +9,8 @@ import com.lee.spa.mapper.AppointmentSlotMapper;
 import com.lee.spa.mapper.SpaServiceMapper;
 import com.lee.spa.mapper.StaffMapper;
 import com.lee.spa.service.AppointmentService;
+import com.lee.spa.service.AppointmentIdempotency;
+import com.lee.spa.service.ScheduleAvailabilityPolicy;
 import com.lee.spa.service.AppointmentTransactionService;
 import com.lee.spa.service.SpaServiceService;
 import com.lee.spa.service.StaffService;
@@ -41,6 +43,8 @@ import java.util.concurrent.TimeUnit;
  * → 写 slot
  */
 public class AppointmentServiceImpl implements AppointmentService {
+    private final com.lee.spa.commerce.OrderService orders;
+    private final com.lee.spa.service.ScheduleConstraintService constraints;
     private final SpaServiceService spaServiceService;
     private final StaffService staffService;
     private final AppointmentSlotMapper appointmentSlotMapper;
@@ -70,12 +74,17 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new BusinessException("预约请求标识不能为空");
         }
 
+        if (request.getUserId() == null || request.getStaffId() == null || request.getServiceId() == null
+                || request.getAppointmentDate() == null || request.getStartTime() == null) {
+            throw new BusinessException("用户、服务、技师、日期和时间不能为空");
+        }
+        if (request.getRequestId().length() > 64) throw new BusinessException("请求标识过长");
         // ② 幂等快速检查
         Appointment existing = getByRequestId(request.getRequestId());
 
         if (existing != null) {
 
-            return existing;
+            return AppointmentIdempotency.verify(existing, request);
 
         }
 
@@ -99,18 +108,18 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         // 检查秒数
-        if (startTime.getSecond() != 0) {
+        if (startTime.getSecond() != 0 || startTime.getNano() != 0) {
             throw new BusinessException("预约时间秒数必须为0");
         }
 
         Staff staffById = staffService.getStaffById(request.getStaffId());
-        if(staffById == null){
+        if(staffById == null || !Integer.valueOf(1).equals(staffById.getStatus())){
             throw new BusinessException("技师不存在");
         }
 
 //        第二步：查询服务
         SpaService spaService = spaServiceService.getServiceById(request.getServiceId());
-        if (spaService == null){
+        if (spaService == null || !Integer.valueOf(1).equals(spaService.getStatus())){
             throw new BusinessException("服务不存在");
         }
 
@@ -130,6 +139,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         Integer durationMinutes = spaService.getDurationMinutes();
+        if (durationMinutes == null || durationMinutes <= 0) throw new BusinessException("服务时长无效");
+        ScheduleAvailabilityPolicy.requireAvailable(staffSchedule,
+                request.getAppointmentDate().atTime(startTime), durationMinutes);
         LocalTime endTime = startTime.plusMinutes(durationMinutes);
 
 
@@ -147,7 +159,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         LocalDateTime endDateTime  = LocalDateTime.of(appointmentDate,endTime);
 
         //    第十四步：（补充）创建预约也应该拒绝过去时间
-        if(startDateTime.isBefore(LocalDateTime.now())){
+        if(startDateTime.isBefore(LocalDateTime.now(ScheduleAvailabilityPolicy.BUSINESS_ZONE))){
             throw new BusinessException("不能预约过去的时间");
         }
 //=====================================================================================================
@@ -170,7 +182,6 @@ public class AppointmentServiceImpl implements AppointmentService {
             System.out.println(Thread.currentThread().getName() + "开始尝试获取锁：" + lockKey);
             locked = lock.tryLock(
                     3, //最多等3秒
-                    10, //拿到锁后自动存在10秒
                     TimeUnit.SECONDS
             );
             // 如果没抢到锁
@@ -352,6 +363,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new BusinessException("预约不存在");
         }
 
+        constraints.lockDay(appointment.getAppointmentDate());
+        appointment = appointmentMapper.selectOne(new LambdaQueryWrapper<Appointment>()
+                .eq(Appointment::getId,appointmentId).last("FOR UPDATE"));
         if(!appointment.getUserId().equals(userId)){
             throw new BusinessException("无权限取消他人预约");
         }
@@ -383,7 +397,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 //
 ////        已经过了预约开始时间，不能取消
 //        LocalDateTime appointmentStart = LocalDateTime.of(appointment.getAppointmentDate(),appointment.getStartTime());
-//        if(LocalDateTime.now().isAfter(appointmentStart)){
+//        if(LocalDateTime.now(ScheduleAvailabilityPolicy.BUSINESS_ZONE).isAfter(appointmentStart)){
 //            throw new BusinessException("预约开始时间已过，不能取消");
 //        }
 
@@ -396,6 +410,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         这样现在允许取消的就是：0 待确认     1 已预约
          */
         appointment.setStatus(3);
+        orders.syncCancelledAppointment(appointment);
         appointmentMapper.updateById(appointment);  //updateById() 的意思就是：根据这个对象的 id 更新数据库。
         LambdaQueryWrapper<AppointmentSlot> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(AppointmentSlot::getAppointmentId,appointmentId);   //对应 SQL：where appointment_id = ?
@@ -443,7 +458,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 );
 
         if (!appointmentStartTime.isAfter(
-                LocalDateTime.now())) {
+                LocalDateTime.now(ScheduleAvailabilityPolicy.BUSINESS_ZONE))) {
 
             return "预约开始时间已过，无法取消";
         }

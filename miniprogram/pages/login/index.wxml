@@ -1,0 +1,7 @@
+<view class="login-page"><view class="brand-seal">栖</view><text class="eyebrow">QI XIN WELLNESS</text>
+<text class="login-title">留一刻，给自己</text><text class="login-subtitle">登录后，安心安排你的护理时光。预约、订单与每一次到店记录，都在这里。</text>
+<view class="login-benefits"><view><text>01</text><text>查询实时技师与时段</text></view><view><text>02</text><text>管理专属预约与订单</text></view><view><text>03</text><text>与智能顾问规划护理</text></view></view>
+<text wx:if="{{errorMessage}}" class="inline-error">{{errorMessage}}</text>
+<button class="primary-button" bindtap="login" loading="{{loading}}" disabled="{{loading}}">{{loading ? '正在安全登录' : '微信快捷登录'}}</button><button class="browse-button" bindtap="browse">先逛一逛</button>
+<view wx:if="{{devLoginEnabled}}" class="dev-login"><text>本地开发测试 · 非微信身份</text><input placeholder="测试身份（字母 / 数字）" value="{{identity}}" bindinput="handleIdentity" maxlength="40" /><button class="secondary-button" disabled="{{loading}}" bindtap="devLogin">进入隔离测试账户</button><text>仅开发服务器显式开启后可用</text></view>
+<text class="privacy-note">仅使用微信登录凭证识别账户，不获取通讯录。真实登录需门店配置微信应用凭据。</text></view>

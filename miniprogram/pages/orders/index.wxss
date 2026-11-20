@@ -5,7 +5,7 @@
 .header-desc { margin-top: 12rpx; color: #898e89; font-size: 21rpx; }
 .tab-scroll { margin-top: 34rpx; white-space: nowrap; }
 .tab-row { display: inline-flex; gap: 16rpx; padding: 0 32rpx 8rpx; }
-.status-tab { padding: 18rpx 30rpx; border: 1rpx solid #d9ded9; border-radius: 36rpx; color: #747b76; font-size: 23rpx; }
+.status-tab { flex: none; width: auto; padding: 18rpx 30rpx; border: 1rpx solid #d9ded9; border-radius: 36rpx; color: #747b76; font-size: 23rpx; }
 .status-tab.is-active { border-color: #315c4c; background: #315c4c; color: #fff; }
 .capability-note { display: flex; flex-direction: column; margin-top: 20rpx; padding-top: 24rpx; padding-bottom: 24rpx; background: #ede5d8; }
 .note-title { color: #654f39; font-size: 24rpx; font-weight: 600; }

@@ -52,3 +52,14 @@ build/
 
 ### Project documentation ###
 /docs/
+!/docs/
+/docs/*
+!/docs/implementation-progress.md
+!/docs/deployment-readiness.md
+!/docs/database-execution.md
+!/docs/frontend-acceptance.md
+
+### Local database backups (business data) ###
+/backups/
+!/docs/acceptance-checklist.md
+!/docs/bugfix-001-013.md

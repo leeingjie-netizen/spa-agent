@@ -1,10 +1,14 @@
 package com.lee.spa.controller;
 
 import com.lee.spa.common.result.Result;
+import com.lee.spa.auth.AuthContext;
+import com.lee.spa.dto.SaveWeeklyRuleRequest;
 import com.lee.spa.entity.SpaService;
 import com.lee.spa.entity.Staff;
 import com.lee.spa.entity.StaffSchedule;
+import com.lee.spa.entity.StaffWeeklyRule;
 import com.lee.spa.service.StaffService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +25,6 @@ public class StaffController {
 
     /**
      * 获取所有员工列表
-     * @return
      */
     @GetMapping
     public Result<List<Staff>> list(){
@@ -30,8 +33,6 @@ public class StaffController {
 
     /**
      * 根据id获取员工信息
-     * @param id
-     * @return
      */
     @GetMapping("/{id}")
     public Result<Staff> getStaffById(@PathVariable Long id) {
@@ -40,8 +41,6 @@ public class StaffController {
 
     /**
      * 根据员工id获取服务列表
-     * @param staffId
-     * @return
      */
     @GetMapping("/{staffId}/services")
     public Result<List<SpaService>> getStaffServices(@PathVariable Long staffId){
@@ -51,9 +50,6 @@ public class StaffController {
 
     /**
      * 获取员工日程
-     * @param staffId
-     * @param date
-     * @return
      */
     @GetMapping("/{staffId}/schedule")
     public Result<StaffSchedule> getStaffSchedule(@PathVariable Long staffId, @RequestParam LocalDate date){
@@ -61,10 +57,6 @@ public class StaffController {
     }
     /**
      * 获取员工可用时间槽
-     * @param staffId
-     * @param date
-     * @param serviceId
-     * @return
      */
     @GetMapping("/{staffId}/availableSlots")
     public Result<List<LocalTime>> getAvailableSlots(@PathVariable Long staffId, @RequestParam LocalDate date, @RequestParam Long serviceId){
@@ -74,8 +66,6 @@ public class StaffController {
 
     /**
      * 根据服务id获取员工列表
-     * @param serviceId
-     * @return
      */
     @GetMapping("/{serviceId}/staff")
     public Result<List<Staff>> getStaffByService(@PathVariable Long serviceId){
@@ -83,4 +73,30 @@ public class StaffController {
 
         return Result.success(availableStaffs);
     }
+
+    @GetMapping("/{staffId}/weekly-rules")
+    public Result<List<StaffWeeklyRule>> getWeeklyRules(@PathVariable Long staffId){
+
+        List<StaffWeeklyRule> rules = staffService.getWeeklyRulesByStaffId(staffId);
+
+        return Result.success(rules);
+
+    }
+
+    @PutMapping("/{staffId}/weekly-rules/{dayOfWeek}")
+    public Result<StaffWeeklyRule> saveOrUpdateWeeklyRule(
+            @PathVariable Long staffId,
+            @PathVariable Integer dayOfWeek,
+            // @RequestBody	把 JSON 转换为 Java DTO
+            // @Valid	触发 DTO 上的 Bean Validation 校验
+            // 特别注意 @Valid：它主要负责你在 DTO 上通过 @NotNull、@Min、@Max 等声明的基础约束。
+            //像“午休必须处于工作时间内”这样的组合条件，仍然由 Service 负责。
+            @Valid @RequestBody SaveWeeklyRuleRequest request) {
+
+        AuthContext.requireRole("ADMIN");
+        StaffWeeklyRule rule = staffService.saveOrUpdateWeeklyRule(staffId, dayOfWeek, request);
+
+        return Result.success(rule);
+    }
+
 }

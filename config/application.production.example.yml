@@ -1,0 +1,53 @@
+# Preparation template only; never loaded by run-local.ps1 and never automatically deployed.
+# Externalize secrets. Use a least-privilege application account after migrations.
+server:
+  address: 127.0.0.1
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+spring:
+  profiles:
+    active: prod
+  application:
+    name: spa-agent
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD}
+  ai:
+    openai:
+      api-key: ${DASHSCOPE_API_KEY:local-unconfigured}
+      base-url: ${SPA_AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+      chat:
+        completions-path: /chat/completions
+        options:
+          model: ${SPA_AI_MODEL:qwen3.8-flash}
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+spa:
+  auth:
+    admin-username: ${SPA_AUTH_ADMIN_USERNAME}
+    admin-password-hash: ${SPA_AUTH_ADMIN_PASSWORD_HASH}
+    dev-login-enabled: false
+  payment:
+    mock-enabled: false
+  scheduling:
+    enabled: false
+  wechat:
+    app-id: ${SPA_WECHAT_APP_ID}
+    app-secret: ${SPA_WECHAT_APP_SECRET}
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.jdbc: INFO
+    com.lee.spa: INFO

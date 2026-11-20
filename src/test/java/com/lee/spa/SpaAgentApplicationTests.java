@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
+@org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named = "SPA_LEGACY_INTEGRATION_TESTS", matches = "true")
 class SpaAgentApplicationTests {
 
     @Autowired

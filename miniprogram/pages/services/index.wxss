@@ -16,5 +16,5 @@
 .category-chip.is-active { border-color: #315c4c; background: #315c4c; color: #fff; }
 .service-count { display: flex; justify-content: space-between; margin-top: 34rpx; color: #384941; font-size: 23rpx; }
 .count-note { color: #9a9e9a; font-size: 20rpx; }
-.service-grid { display: flex; flex-wrap: wrap; gap: 22rpx; margin-top: 22rpx; }
-.service-cell { width: calc(50% - 11rpx); }
+.service-grid { display: block; margin-top: 22rpx; }
+.service-cell { width: 100%; margin-bottom: 24rpx; }

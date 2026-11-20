@@ -3,10 +3,10 @@ const { getRuntimeConfig } = require('./config/env')
 App({
   globalData: {
     runtime: getRuntimeConfig(),
-    currentUser: {
-      id: '1',
-      nickname: '体验用户',
-      avatarUrl: ''
-    }
+    currentUser: null
+  },
+  onLaunch() {
+    const session = wx.getStorageSync('spaSession')
+    if (session && session.user) this.globalData.currentUser = session.user
   }
 })

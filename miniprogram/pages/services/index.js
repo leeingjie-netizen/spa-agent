@@ -12,6 +12,9 @@ Page({
     categories,
     activeCategory: 'all',
     keyword: '',
+    sort: 'default',
+    sortLabels: ['默认排序', '价格从低到高', '时长从短到长'],
+    sortIndex: 0,
     services: [],
     filteredServices: [],
     loading: true,
@@ -59,6 +62,12 @@ Page({
     this.applyFilters()
   },
 
+  selectSort(event) {
+    const sortIndex = Number(event.detail.value)
+    this.setData({ sortIndex, sort: ['default', 'price', 'duration'][sortIndex] })
+    this.applyFilters()
+  },
+
   applyFilters() {
     const { services, keyword, activeCategory } = this.data
     const normalizedKeyword = keyword.trim().toLowerCase()
@@ -75,6 +84,8 @@ Page({
       return keywordMatched && categoryMatched
     })
 
+    if (this.data.sort === 'price') filteredServices.sort((a, b) => Number(a.price) - Number(b.price))
+    if (this.data.sort === 'duration') filteredServices.sort((a, b) => a.durationMinutes - b.durationMinutes)
     this.setData({ filteredServices })
   },
 

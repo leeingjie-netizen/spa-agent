@@ -96,6 +96,20 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- Local ignored configuration can contain credentials. Supply external configuration at runtime. -->
+                    <excludes>
+                        <exclude>application*.yml</exclude>
+                        <exclude>application*.yaml</exclude>
+                        <exclude>application*.properties</exclude>
+                        <exclude>**/*.pem</exclude>
+                        <exclude>**/*.key</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>

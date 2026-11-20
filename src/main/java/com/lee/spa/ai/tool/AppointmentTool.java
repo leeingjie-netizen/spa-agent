@@ -107,8 +107,11 @@ public class AppointmentTool {
 
         CreateAppointmentRequest request = new CreateAppointmentRequest();
 
-        // 当前暂时使用固定的演示用户
-        request.setUserId(1L);
+        if (!Boolean.TRUE.equals(toolContext.getContext().get("bookingConfirmed"))) {
+            throw new com.lee.spa.common.exception.BusinessException("请先展示完整预约信息，并让用户单独回复“确认预约”后再创建");
+        }
+        // Identity and confirmation are supplied by the server, never by model tool arguments.
+        request.setUserId((Long) toolContext.getContext().get("userId"));
 
         request.setServiceId(serviceId);
         request.setStaffId(staffId);
@@ -156,6 +159,9 @@ public class AppointmentTool {
             ToolContext toolContext
     ){
 
+        if (!Boolean.TRUE.equals(toolContext.getContext().get("cancellationConfirmed"))) {
+            throw new com.lee.spa.common.exception.BusinessException("请先展示预约信息，并让用户单独回复“确认取消”后再取消");
+        }
         log.info("AI Tool 被调用：cancelAppointment, appointmentId={},userId={}", appointmentId, (Long)toolContext.getContext().get("userId"));
         appointmentService.cancelAppointmentByAptId(appointmentId, (Long)toolContext.getContext().get("userId"));
         return true;

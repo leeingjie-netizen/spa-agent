@@ -3,171 +3,85 @@ package com.lee.spa.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lee.spa.common.exception.BusinessException;
 import com.lee.spa.dto.CreateAppointmentRequest;
-import com.lee.spa.entity.Appointment;
-import com.lee.spa.entity.AppointmentSlot;
-import com.lee.spa.entity.SpaService;
-import com.lee.spa.mapper.AppointmentMapper;
-import com.lee.spa.mapper.AppointmentSlotMapper;
+import com.lee.spa.entity.*;
+import com.lee.spa.mapper.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-
-// 专门承担“创建预约时需要事务保护的数据库操作”
 public class AppointmentTransactionService {
-
+    private final com.lee.spa.commerce.OrderService orders;
     private final AppointmentMapper appointmentMapper;
-
     private final AppointmentSlotMapper appointmentSlotMapper;
+    private final StaffScheduleMapper staffScheduleMapper;
+    private final SpaServiceMapper spaServiceMapper;
+    private final StaffMapper staffMapper;
+    private final StaffService staffService;
+    private final ScheduleConstraintService scheduleConstraints;
 
-    /*
-        因为接下来它需要：
-                        1. 查 appointment_slot
-                        2. 写 appointment
-                        3. 写 appointment_slot
-     */
-
-
-    /*
-        为什么不直接只传 request？
-
-                    因为前面的锁外部分已经做过：
-
-                    查询 SpaService
-                            ↓
-                    取得 durationMinutes
-                            ↓
-                    取得 price
-                            ↓
-                    计算 endTime
-
-                    没有必要事务开始以后再重新做一遍这些不会因为预约竞争而变化的工作。
-
-                    所以可以把前面已经得到的数据直接交给事务方法。 ⬇
-     */
+    /** The caller retains the Redisson watchdog lock until this transaction commits. */
     @Transactional
     public Appointment creatAppointmentInTransaction(CreateAppointmentRequest request,
-                                                     SpaService spaService,
-                                                     LocalTime endTime,
-                                                     LocalDateTime startDateTime,
-                                                     LocalDateTime endDateTime){
-        Appointment existing =
-                getByRequestId(request.getRequestId());
+            SpaService ignoredService, LocalTime ignoredEndTime,
+            LocalDateTime ignoredStart, LocalDateTime ignoredEnd) {
+        Appointment existing = appointmentMapper.selectOne(new LambdaQueryWrapper<Appointment>()
+                .eq(Appointment::getRequestId, request.getRequestId()));
+        if (existing != null) return AppointmentIdempotency.verify(existing, request);
 
-        if (existing != null) {
-            return existing;
+        scheduleConstraints.lockDay(request.getAppointmentDate());
+
+        // Lock the current daily record; manual schedule edits must use the same row lock.
+        StaffSchedule schedule = staffScheduleMapper.selectForUpdate(request.getStaffId(), request.getAppointmentDate());
+        SpaService service = spaServiceMapper.selectById(request.getServiceId());
+        Staff staff = staffMapper.selectById(request.getStaffId());
+        if (service == null || !Integer.valueOf(1).equals(service.getStatus())
+                || service.getDurationMinutes() == null || service.getDurationMinutes() <= 0
+                || service.getPrice() == null || service.getPrice().signum() < 0
+                || staff == null || !Integer.valueOf(1).equals(staff.getStatus())
+                || !staffService.supportsService(request.getStaffId(), request.getServiceId())) {
+            throw new BusinessException("服务或技师当前不可预约");
         }
-
-        Appointment appointment = null;
-
-
-
-        //        第七步：写slot冲突查询
-        LambdaQueryWrapper<AppointmentSlot> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AppointmentSlot::getStaffId,request.getStaffId())
-                .ge(AppointmentSlot::getSlotTime,startDateTime)
-                .lt(AppointmentSlot::getSlotTime,endDateTime);
-        List<AppointmentSlot> conflictSlots = appointmentSlotMapper.selectList(wrapper);
-
-//        判断是否冲突
-        if(!conflictSlots.isEmpty()){
+        LocalDateTime start = request.getAppointmentDate().atTime(request.getStartTime());
+        if (!start.isAfter(LocalDateTime.now(ScheduleAvailabilityPolicy.BUSINESS_ZONE))) {
+            throw new BusinessException("不能预约过去的时间");
+        }
+        ScheduleAvailabilityPolicy.requireAvailable(schedule, start, service.getDurationMinutes());
+        scheduleConstraints.requireAvailable(request.getStaffId(), start, service.getDurationMinutes());
+        LocalDateTime end = start.plusMinutes(service.getDurationMinutes());
+        // Every occupied slot reserves its complete 30-minute bucket, including a partial final bucket.
+        // Looking back 30 minutes also protects legacy off-grid bucket starts.
+        if (!appointmentSlotMapper.selectList(new LambdaQueryWrapper<AppointmentSlot>()
+                .eq(AppointmentSlot::getStaffId, request.getStaffId())
+                .gt(AppointmentSlot::getSlotTime, start.minusMinutes(30))
+                .lt(AppointmentSlot::getSlotTime, end)).isEmpty()) {
             throw new BusinessException("该时间段已被预约，请重新选择");
         }
-
-        //        第八步：构造appointment
-        appointment = new Appointment();
-        appointment.setUserId(request.getUserId());  //来自前端
-        appointment.setServiceId(request.getServiceId());  //来自前端
-        appointment.setStaffId(request.getStaffId());  //来自前端
-        appointment.setAppointmentDate(request.getAppointmentDate());  //来自前端
+        Appointment appointment = new Appointment();
+        appointment.setUserId(request.getUserId());
+        appointment.setServiceId(request.getServiceId());
+        appointment.setStaffId(request.getStaffId());
+        appointment.setAppointmentDate(request.getAppointmentDate());
         appointment.setStartTime(request.getStartTime());
-        appointment.setEndTime(endTime);
-        appointment.setAmount(spaService.getPrice());  // 来自数据库
-        appointment.setRemark(request.getRemark());   //
-
-        appointment.setStatus(1);  // 之后改成枚举，现在暂时直接设置
-
+        appointment.setEndTime(end.toLocalTime());
+        appointment.setAmount(service.getPrice());
+        appointment.setRemark(request.getRemark());
+        appointment.setStatus(1);
         appointment.setRequestId(request.getRequestId());
-
-        /*
-        System.currentTimeMillis()
-            获取当前系统时间戳：从 1970-01-01 00:00:00 UTC 到现在的毫秒数，返回 long 类型。
-            示例：1756789012345
-            "APT" + 时间戳
-            字符串拼接，把前缀 APT 和毫秒数字拼成一整个字符串。
-         */
-        String appointmentNo = "APT" + System.currentTimeMillis();  //后面我们可以再优化成更规范的雪花 ID 或业务单号，但现在先跑通。
-        appointment.setAppointmentNo(appointmentNo);
-
-        //        第九步：insert appointment
-        /*
-        前面构造的：
-                Appointment appointment
-                目前只是 Java 内存里的对象。
-                数据库里还没有。
-         */
+        appointment.setAppointmentNo(UUID.randomUUID().toString().replace("-", ""));
         appointmentMapper.insert(appointment);
-
-//        // 临时事务测试代码
-//        boolean rollbackTest = true;
-//        if (rollbackTest) {
-//            throw new RuntimeException(
-//                    "事务回滚测试：模拟 appointment 写入后发生异常"
-//            );
-//        }
-
-        /*
-        插入完成之后：
-                appointment.getId()
-                就可以拿到数据库生成的 ID。
-                例如：
-                appointment.getId() = 15
-                这个 ID 马上拿来关联 appointment_slot。
-         */
-
-
-//        第十步：生成预约slot
-        LocalDateTime slotTime = startDateTime;
-
-
-
-        while(slotTime.isBefore(endDateTime)){
-
-            //        第十一步：创建AppointmentSlot
+        for (LocalDateTime bucket = start; bucket.isBefore(end); bucket = bucket.plusMinutes(30)) {
             AppointmentSlot slot = new AppointmentSlot();
-            slot.setAppointmentId(appointment.getId());  // 设置预约 ID
+            slot.setAppointmentId(appointment.getId());
             slot.setStaffId(request.getStaffId());
-            slot.setSlotTime(slotTime);
-
+            slot.setSlotTime(bucket);
             appointmentSlotMapper.insert(slot);
-
-
-
-
-            // 创建一个slot
-            slotTime = slotTime.plusMinutes(30);
         }
-
-
+        orders.ensureForAppointment(appointment);
         return appointment;
-    }
-
-    private Appointment getByRequestId(String requestId) {
-
-        LambdaQueryWrapper<Appointment> wrapper =
-                new LambdaQueryWrapper<>();
-
-        wrapper.eq(
-                Appointment::getRequestId,
-                requestId
-        );
-
-        return appointmentMapper.selectOne(wrapper);
     }
 }

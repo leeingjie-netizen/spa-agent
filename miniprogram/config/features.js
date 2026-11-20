@@ -1,7 +1,7 @@
 module.exports = {
   paymentEnabled: false,
-  membershipEnabled: false,
-  couponsEnabled: false,
-  pointsEnabled: false,
+  membershipEnabled: true,
+  couponsEnabled: true,
+  pointsEnabled: true,
   customerServiceEnabled: false
 }

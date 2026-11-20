@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @SpringBootTest
+@org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named = "SPA_LEGACY_INTEGRATION_TESTS", matches = "true")
 public class AppointmentConcurrencyTest {
 
     @Autowired

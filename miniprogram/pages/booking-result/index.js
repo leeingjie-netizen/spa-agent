@@ -4,7 +4,8 @@ Page({
   },
 
   onLoad() {
-    this.setData({ result: wx.getStorageSync('lastBookingResult') || null })
+    const result = wx.getStorageSync('lastBookingResult')
+    this.setData({ result: result && result.state === 'success' && result.appointment && result.appointment.id ? result : null })
   },
 
   goToOrders() {

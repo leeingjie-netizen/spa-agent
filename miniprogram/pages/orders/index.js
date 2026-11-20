@@ -1,33 +1,15 @@
-const { getAppointmentSummaries, cancelAppointment } = require('../../api/appointments')
+const { requireLogin } = require('../../utils/session')
+const { listOrders, cancelOrder } = require('../../api/orders')
+const { decorateOrder } = require('../../utils/order')
 
 const tabs = [
   { key: 'all', label: '全部' },
   { key: 'unpaid', label: '待支付' },
   { key: 'upcoming', label: '待服务' },
   { key: 'inService', label: '服务中' },
-  { key: 'completed', label: '已完成' }
+  { key: 'completed', label: '已完成' },
+  { key: 'cancelled', label: '已取消' }
 ]
-
-function decorateAppointment(item) {
-  const statusMap = {
-    0: { label: '待确认', tone: 'pending', group: 'upcoming' },
-    1: { label: '已预约', tone: 'booked', group: 'upcoming' },
-    2: { label: '已完成', tone: 'completed', group: 'completed' },
-    3: { label: '已取消', tone: 'cancelled', group: 'cancelled' }
-  }
-  const meta = statusMap[item.status] || { label: '状态未知', tone: 'unknown', group: 'unknown' }
-  return {
-    ...item,
-    appointmentId: String(item.appointmentId),
-    serviceId: String(item.serviceId),
-    staffId: String(item.staffId),
-    startTimeDisplay: String(item.startTime || '').slice(0, 5),
-    endTimeDisplay: String(item.endTime || '').slice(0, 5),
-    statusLabel: meta.label,
-    statusTone: meta.tone,
-    statusGroup: meta.group
-  }
-}
 
 Page({
   data: {
@@ -40,14 +22,12 @@ Page({
     errorMessage: ''
   },
 
-  onLoad() {
-    this.loadAppointments()
-  },
+  onLoad() {},
 
   onShow() {
     const tabBar = this.getTabBar && this.getTabBar()
     if (tabBar) tabBar.setData({ selected: 2 })
-    if (this.data.appointments.length) this.loadAppointments()
+    this.loadAppointments()
   },
 
   onPullDownRefresh() {
@@ -55,10 +35,10 @@ Page({
   },
 
   async loadAppointments() {
+    if (!requireLogin()) { this.setData({ loading: false, appointments: [], filteredAppointments: [] }); return }
     this.setData({ loading: true, errorMessage: '' })
     try {
-      const userId = getApp().globalData.currentUser.id
-      const appointments = (await getAppointmentSummaries(userId) || []).map(decorateAppointment)
+      const appointments = (await listOrders() || []).map(decorateOrder)
       this.setData({ appointments })
       this.applyFilter()
     } catch (error) {
@@ -83,23 +63,11 @@ Page({
   },
 
   viewDetail(event) {
-    const appointmentId = String(event.currentTarget.dataset.id)
-    const order = this.data.appointments.find((item) => item.appointmentId === appointmentId)
-    wx.setStorageSync('selectedOrder', order)
-    wx.navigateTo({ url: '/pages/order-detail/index' })
+    wx.navigateTo({ url: `/pages/order-detail/index?id=${event.currentTarget.dataset.id}` })
   },
 
   rebook(event) {
     wx.navigateTo({ url: `/pages/booking/index?serviceId=${event.currentTarget.dataset.serviceId}` })
-  },
-
-  requestPayment() {
-    wx.showModal({
-      title: '支付功能待接入',
-      content: '当前后端尚未接入微信支付。正式接入后将由后端创建支付单并校验支付结果。',
-      showCancel: false,
-      confirmColor: '#315C4C'
-    })
   },
 
   confirmCancel(event) {
@@ -117,9 +85,10 @@ Page({
   },
 
   async cancelOrder(appointmentId) {
+    if (this.data.cancellingId) return
     this.setData({ cancellingId: appointmentId })
     try {
-      await cancelAppointment(appointmentId, getApp().globalData.currentUser.id)
+      await cancelOrder(appointmentId)
       wx.showToast({ title: '预约已取消', icon: 'success' })
       await this.loadAppointments()
     } catch (error) {

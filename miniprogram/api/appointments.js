@@ -4,17 +4,16 @@ function createAppointment(data) {
   return request({ url: '/api/appointments', method: 'POST', data })
 }
 
-function getAppointmentSummaries(userId) {
-  return request({ url: `/api/appointments/user/${userId}/summaries` })
+function getAppointmentSummaries() {
+  return request({ url: '/api/appointments/me' })
 }
 
-function cancelAppointment(appointmentId, userId) {
+function cancelAppointment(appointmentId) {
   return request({
     url: `/api/appointments/${appointmentId}/cancel`,
-    method: 'POST',
-    data: { userId },
-    header: { 'content-type': 'application/x-www-form-urlencoded' }
+    method: 'POST'
   })
 }
 
-module.exports = { createAppointment, getAppointmentSummaries, cancelAppointment }
+function getAppointment(id) { return request({ url: `/api/appointments/${id}` }) }
+module.exports = { createAppointment, getAppointmentSummaries, cancelAppointment, getAppointment }
