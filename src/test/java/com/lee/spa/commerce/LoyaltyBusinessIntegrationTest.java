@@ -16,8 +16,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(properties={
- "spring.datasource.url=jdbc:mysql://127.0.0.1:3306/spa?serverTimezone=Asia/Shanghai",
- "spring.datasource.username=root","spring.datasource.password=${MYSQL_PWD:}",
  "spring.ai.openai.api-key=local-integration-placeholder",
  "spa.payment.mock-enabled=true","spa.scheduling.enabled=false","spa.orders.timeout-enabled=false"})
 @ActiveProfiles("test")
@@ -30,7 +28,7 @@ class LoyaltyBusinessIntegrationTest {
  @Autowired OperationsController operations;
  long fixture;String request;
  @BeforeEach void fixtures(){
-  assertEquals("spa",jdbc.queryForObject("SELECT DATABASE()",String.class));
+  try { com.lee.spa.AcceptanceIsolation.verify(jdbc.getDataSource()); } catch(Exception e) { throw new IllegalStateException(e); }
   fixture=-ThreadLocalRandom.current().nextLong(1000000000L,900000000000L);request="loyalty-it-"+(-fixture);
   jdbc.update("INSERT INTO spa_user(id,nickname,status) VALUES(?,?,1)",fixture,"loyalty-integration");
   jdbc.update("INSERT INTO staff(id,name,status) VALUES(?,?,1)",fixture,"loyalty-integration");
@@ -100,6 +98,7 @@ class LoyaltyBusinessIntegrationTest {
   assertThrows(BusinessException.class,()->operations.review(fixture,new OperationsController.Review(5,"not completed")));
   orders.pay(fixture,"MOCK",request);
   AuthContext.set(new AuthPrincipal(fixture,"ADMIN",null));
+  jdbc.update("UPDATE appointment SET appointment_date=?,start_time='00:00',end_time='00:01' WHERE id=?",LocalDate.now(ZoneId.of("Asia/Shanghai")),fixture);
   orders.transition(fixture,"IN_SERVICE");orders.transition(fixture,"COMPLETED");orders.transition(fixture,"COMPLETED");
   assertEquals(1,count("SELECT COUNT(*) FROM spa_points_entry WHERE order_id=?"));
   AuthContext.set(new AuthPrincipal(fixture-1,"USER",null));

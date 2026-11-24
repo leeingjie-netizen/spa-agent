@@ -21,11 +21,17 @@ class SafeErrorResponseTest {
    .andExpect(jsonPath("$.data.appointmentIds[0]").value(42));
  }
  @Test void internalSqlDetailsAreNeverReturnedToTheClient(){
+  var logger=(ch.qos.logback.classic.Logger)org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+  var appender=new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();appender.start();logger.addAppender(appender);
+  try {
   var response=new GlobalExceptionHandler().unexpected(new IllegalStateException("jdbc:mysql://internal password=secret SELECT * FROM spa_account"));
   assertEquals(500,response.getStatusCode().value());
   assertNotNull(response.getBody());
   assertFalse(response.getBody().getMessage().contains("secret"));
   assertFalse(response.getBody().getMessage().contains("SELECT"));
   assertNull(response.getBody().getData());
+  assertFalse(appender.list.isEmpty());
+  assertTrue(appender.list.stream().allMatch(e->!e.getFormattedMessage().contains("secret")&&e.getThrowableProxy()==null));
+  }finally{logger.detachAppender(appender);appender.stop();}
  }
 }

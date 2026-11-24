@@ -29,6 +29,7 @@ class RealConcurrentBusinessTest {
  @Autowired JdbcTemplate jdbc;
  @Autowired TransactionTemplate transaction;
  @Autowired AppointmentService appointments;
+ @Autowired org.redisson.api.RedissonClient redis;
  @Autowired ScheduleManagementService management;
  @SpyBean AppointmentSlotMapper slots;
  private static final AtomicLong IDS=new AtomicLong(-Math.abs(System.nanoTime()));
@@ -40,8 +41,9 @@ class RealConcurrentBusinessTest {
  @BeforeEach void createFixtures() throws Exception {
   try(var c=dataSource.getConnection()){
    String url=c.getMetaData().getURL();
-   assertTrue(url.startsWith("jdbc:mysql://localhost:3306/spa?")||url.startsWith("jdbc:mysql://127.0.0.1:3306/spa?"),"Only verified local development database is allowed");
+   com.lee.spa.AcceptanceIsolation.verify(dataSource);
   }
+  RedisTestSupport.real(redis);
   staffId=id();userId=id();serviceId=id();relationId=id();scheduleId=id();
   date=LocalDate.now(ScheduleAvailabilityPolicy.BUSINESS_ZONE).plusDays(180);
   while(jdbc.queryForObject("SELECT (SELECT COUNT(*) FROM staff_schedule WHERE work_date=?) + (SELECT COUNT(*) FROM appointment WHERE appointment_date=?) + (SELECT COUNT(*) FROM business_day WHERE work_date=?)",Integer.class,date,date,date)>0) date=date.plusDays(1);
@@ -69,8 +71,6 @@ class RealConcurrentBusinessTest {
    jdbc.update("DELETE FROM spa_user WHERE id=?",userId);
    jdbc.update("DELETE FROM business_day WHERE work_date=?",date);
    if(!dayLockExisted)jdbc.update("DELETE FROM schedule_day_lock WHERE work_date=?",date);
-   jdbc.update("DELETE FROM business_day WHERE work_date=?",date);
-   jdbc.update("DELETE FROM schedule_day_lock WHERE work_date=?",date);
    return null;
   });
   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM appointment WHERE staff_id=?",Integer.class,staffId));

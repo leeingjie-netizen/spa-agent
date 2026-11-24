@@ -1,0 +1,8 @@
+{
+  "deploy/database-policy.sh": "100755",
+  "deploy/grant-app.sh": "100755",
+  "deploy/init-empty.sh": "100755",
+  "deploy/ops.sh": "100755",
+  "deploy/redis.sh": "100755",
+  "mvnw": "100755"
+}

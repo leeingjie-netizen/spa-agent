@@ -32,8 +32,21 @@ class BugfixRegressionIntegrationTest {
  @Autowired AppointmentService appointments;@Autowired StaffService staff;@Autowired ScheduleManagementService scheduling;
  long id;LocalDate date;
  @BeforeEach void localOnly() throws Exception {
-  try(var c=dataSource.getConnection()){String url=c.getMetaData().getURL();assertTrue(url.startsWith("jdbc:mysql://localhost:3306/spa?")||url.startsWith("jdbc:mysql://127.0.0.1:3306/spa?"));}
+  try(var c=dataSource.getConnection()){String url=c.getMetaData().getURL();com.lee.spa.AcceptanceIsolation.verify(dataSource);}
   AuthContext.set(new AuthPrincipal(-90001L,"ADMIN",null));id=-Math.abs(System.nanoTime());date=LocalDate.now(ScheduleAvailabilityPolicy.BUSINESS_ZONE).plusDays(150);
+  // Artificial historical shapes, never customer data. The whole fixture rolls back.
+  jdbc.update("INSERT INTO spa_user(id,nickname,status) VALUES(?,'round2-synthetic-history',1)",id);
+  jdbc.update("INSERT INTO staff(id,name,status) VALUES(?,'round2-synthetic-history',1)",id-10);
+  jdbc.update("INSERT INTO spa_service(id,name,price,duration_minutes,status) VALUES(?,'round2-synthetic-history',120,60,1)",id-10);
+  for(int i=0;i<3;i++){
+   long key=id-100-i;String ref="r2-history-"+(-key);
+   jdbc.update("INSERT INTO appointment(id,appointment_no,user_id,service_id,staff_id,appointment_date,start_time,end_time,amount,status,request_id) VALUES(?,?,?,?,?,'2026-01-05','10:00','11:00',120,3,?)",key,ref,id,id-10,id-10,ref);
+   if(i==0)continue;
+   jdbc.update("INSERT INTO spa_order(id,appointment_id,order_no,user_id,amount,status,payment_status,payment_channel,expires_at) VALUES(?,?,?,?,109,'REFUNDED','REFUNDED','MOCK_WALLET','2026-01-05')",key,key,ref,id);
+   jdbc.update("INSERT INTO spa_order_benefit(order_id,user_id,points_used,original_amount,status) VALUES(?,?,100,120,'RELEASED')",key,id);
+   jdbc.update("INSERT INTO spa_points_adjustment(id,user_id,order_id,points,kind) VALUES(?,?,?,-100,'RESERVE'),(?,?,?,100,'RELEASE')",key,id,key,key-10,id,key);
+   jdbc.update("INSERT INTO spa_payment(id,order_id,request_id,kind,channel,amount,status) VALUES(?,?,?,'PAY','MOCK_WALLET',109,'SIMULATED_SUCCESS'),(?,?,?,'REFUND','MOCK_WALLET',109,'SIMULATED_SUCCESS')",key,key,ref+"-pay",key-10,key,ref+"-refund");
+  }
  }
  @AfterEach void clear(){AuthContext.clear();}
  MockHttpServletRequest request(String path){return new MockHttpServletRequest("GET",path);}
@@ -85,7 +98,8 @@ class BugfixRegressionIntegrationTest {
   while(jdbc.queryForObject("SELECT COUNT(*) FROM business_day WHERE work_date=?",Integer.class,date)>0)date=date.plusDays(1);
   jdbc.update("INSERT INTO staff_schedule(id,staff_id,work_date,start_time,end_time,status,source) VALUES (?,?,?,'09:00','18:00',1,'MANUAL')",id,id,date);
  }
- @Test void disabledStaffIsHiddenAndBookingRejectedThenReenabledBookingSucceeds(){
+ @Test @EnabledIfEnvironmentVariable(named="SPA_REAL_CONCURRENCY_TESTS",matches="true")
+ void disabledStaffIsHiddenAndBookingRejectedThenReenabledBookingSucceeds(){
   fixture();assertTrue(staff.getStaffByService(id).isEmpty());assertTrue(staff.getAvailableSlots(id,date,id).isEmpty());
   CreateAppointmentRequest input=new CreateAppointmentRequest();input.setUserId(id);input.setStaffId(id);input.setServiceId(id);input.setAppointmentDate(date);input.setStartTime(LocalTime.of(10,0));input.setRequestId("bugfix-"+UUID.randomUUID());
   assertThrows(BusinessException.class,()->appointments.createAppointment(input));

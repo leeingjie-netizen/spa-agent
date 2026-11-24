@@ -17,7 +17,7 @@ class FinanceLedgerIntegrationTest {
  private static final LocalDate DATE=LocalDate.of(2095,2,5);
  @AfterEach void clear(){AuthContext.clear();}
  @Test void allLedgerSourcesPaginateAndTopupsRemainSeparateFromRevenue(){
-  assertEquals("spa",jdbc.queryForObject("SELECT DATABASE()",String.class));
+  try { com.lee.spa.AcceptanceIsolation.verify(jdbc.getDataSource()); } catch(Exception e) { throw new IllegalStateException(e); }
   long id=-Math.abs(System.nanoTime());AuthContext.set(new AuthPrincipal(id,"ADMIN",null));
   jdbc.update("INSERT INTO spa_order(id,appointment_id,order_no,user_id,amount,status,created_at,expires_at) VALUES(?,?,?,?,130,'WAITING_SERVICE','2095-02-05','2095-02-06')",id,id,"finance-"+(-id),id);
   for(var payment:List.of(new Object[]{id,"PAY",130},new Object[]{id-1,"REFUND",30}))jdbc.update("INSERT INTO spa_payment(id,order_id,request_id,kind,channel,amount,status,created_at) VALUES(?,?,?,?,'MOCK_WALLET',?,'SIMULATED_SUCCESS','2095-02-05')",payment[0],id,"finance-"+payment[0],payment[1],payment[2]);

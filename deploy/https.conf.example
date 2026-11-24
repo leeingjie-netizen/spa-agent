@@ -1,0 +1,14 @@
+# User installs this on the host TLS reverse proxy after obtaining certificate.
+server {
+    listen 443 ssl;
+    server_name api.example.com;
+    ssl_certificate /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    location /health/ { return 404; }
+    location / {
+        proxy_pass http://127.0.0.1:18088;
+        include /etc/nginx/proxy_params_spa;
+    }
+}
+# Once TLS works, add a port 80 server returning 301 https://$host$request_uri.

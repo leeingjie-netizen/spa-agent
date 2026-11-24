@@ -31,7 +31,7 @@ class ScheduleManagementIntegrationTest {
  @BeforeEach void setup() throws Exception {
   try(var connection=dataSource.getConnection()) {
    String url=connection.getMetaData().getURL();
-   assertTrue(url.startsWith("jdbc:mysql://localhost:3306/spa?") || url.startsWith("jdbc:mysql://127.0.0.1:3306/spa?"), "Only the verified local spa development database is allowed");
+   com.lee.spa.AcceptanceIsolation.verify(dataSource);
   }
   AuthContext.set(new AuthPrincipal(-90001L,"ADMIN",null));
   Staff technician=new Staff();technician.setId(-Math.abs(System.nanoTime()));technician.setName("transaction-test-fixture");technician.setStatus(1);staff.insert(technician);staffId=technician.getId();

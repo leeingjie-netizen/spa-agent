@@ -47,8 +47,15 @@ public class OrderService {
         if(!mockEnabled()) throw new AuthException(403,"模拟支付未开放");
         if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{8,64}")) throw new BusinessException("支付请求标识无效");
         Map<String,Object> order=lock(id); owner(order);
-        var prior=jdbc.queryForList("SELECT order_id FROM spa_payment WHERE request_id=?",requestId);
-        if(!prior.isEmpty()) { if(((Number)prior.get(0).get("order_id")).longValue()!=id) throw new BusinessException("请求标识已被其他订单使用"); return detail(id); }
+        // The earlier link lookup can establish a REPEATABLE READ snapshot before
+        // a contender commits. Use a current read after serializing on the order.
+        var prior=jdbc.queryForList("SELECT order_id,kind,channel FROM spa_payment WHERE request_id=? FOR UPDATE",requestId);
+        if(!prior.isEmpty()) {
+            var previous=prior.get(0);
+            if(((Number)previous.get("order_id")).longValue()!=id || !"PAY".equals(previous.get("kind")) || !channel.equals(previous.get("channel")))
+                throw new BusinessException("请求标识已用于不同的支付操作");
+            return detail(id);
+        }
         if(!"WAITING_PAYMENT".equals(order.get("status"))) throw new BusinessException("当前订单不可支付");
         if(expired(order)) throw new BusinessException("订单支付已超时，请刷新订单");
         loyalty.consume(order,channel);
@@ -84,6 +91,10 @@ public class OrderService {
         if("CANCELLED".equals(target)) {cancelLocked(order,target);return detail(id);}
         boolean allowed=(old.equals("WAITING_SERVICE")&&target.equals("IN_SERVICE"))||(old.equals("IN_SERVICE")&&target.equals("COMPLETED"));
         if(!allowed) throw new BusinessException("不允许的订单状态变更");
+        Object rawDate=order.get("appointment_date"),rawTime=order.get(target.equals("COMPLETED")?"end_time":"start_time");
+        LocalDate serviceDate=rawDate instanceof java.sql.Date d?d.toLocalDate():(LocalDate)rawDate;
+        LocalTime serviceTime=rawTime instanceof java.sql.Time t?t.toLocalTime():(LocalTime)rawTime;
+        if(serviceDate.atTime(serviceTime).isAfter(LocalDateTime.now(ZONE))) throw new BusinessException("尚未到预约服务时间，不能提前开始或完成服务");
         if(expiredAppointment(order)&&!target.equals("COMPLETED")) throw new BusinessException("预约日期已过，请人工核实");
         jdbc.update("UPDATE spa_order SET status=? WHERE id=?",target,id);
         if(target.equals("COMPLETED")) {
@@ -104,7 +115,7 @@ public class OrderService {
         Object date=link.get("appointment_date");
         constraints.lockDay(date instanceof java.sql.Date sqlDate ? sqlDate.toLocalDate() : (LocalDate)date);
         jdbc.queryForList("SELECT id FROM staff_schedule WHERE staff_id=? AND work_date=? FOR UPDATE",link.get("staff_id"),link.get("appointment_date"));
-        return jdbc.queryForMap("SELECT o.*,a.appointment_date,a.start_time FROM spa_order o JOIN appointment a ON a.id=o.appointment_id WHERE o.id=? FOR UPDATE",id);
+        return jdbc.queryForMap("SELECT o.*,a.appointment_date,a.start_time,a.end_time FROM spa_order o JOIN appointment a ON a.id=o.appointment_id WHERE o.id=? FOR UPDATE",id);
     }
     private void owner(Map<String,Object> order) {
         Object user=order.containsKey("userId")?order.get("userId"):order.get("user_id");

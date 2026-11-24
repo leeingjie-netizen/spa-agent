@@ -1,0 +1,58 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+  shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+spring:
+  application:
+    name: spa-agent
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  datasource:
+    url: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      timeout: 3s
+  ai:
+    openai:
+      api-key: ${DASHSCOPE_API_KEY:local-unconfigured}
+      base-url: ${SPA_AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+      chat:
+        completions-path: /chat/completions
+        options:
+          model: ${SPA_AI_MODEL:qwen3.8-flash}
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+spa:
+  deployment:
+    mode: ${SPA_DEPLOYMENT_MODE}
+  auth:
+    admin-username: ${SPA_AUTH_ADMIN_USERNAME}
+    admin-password-hash: ${SPA_AUTH_ADMIN_PASSWORD_HASH}
+    dev-login-enabled: false
+  payment:
+    mock-enabled: false
+  scheduling:
+    enabled: false
+  orders:
+    timeout-enabled: true
+  wechat:
+    app-id: ${SPA_WECHAT_APP_ID:}
+    app-secret: ${SPA_WECHAT_APP_SECRET:}
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.lee.spa: INFO

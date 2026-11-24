@@ -19,7 +19,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public org.springframework.http.ResponseEntity<Result<Void>> unexpected(Exception error) {
         String reference = java.util.UUID.randomUUID().toString();
-        LOG.error("Request failed reference={}", reference, error);
+        // JDBC/HTTP exception messages may contain bind values, customer input or credentials.
+        LOG.error("Request failed reference={} type={}", reference, error.getClass().getSimpleName());
         return org.springframework.http.ResponseEntity.internalServerError()
                 .body(new Result<>(500, "服务暂时不可用，请稍后重试。参考编号：" + reference, null));
     }

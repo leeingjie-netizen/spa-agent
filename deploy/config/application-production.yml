@@ -1,0 +1,7 @@
+spa:
+  scheduling:
+    enabled: false
+  payment:
+    mock-enabled: false
+  auth:
+    dev-login-enabled: false

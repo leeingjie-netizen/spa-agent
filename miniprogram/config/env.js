@@ -6,16 +6,27 @@ const environments = {
   },
   production: {
     name: '正式环境',
-    baseUrl: 'https://api.example.com'
+    baseUrl: 'https://api.example.com',
+    devLoginEnabled: false
+  },
+  staging: {
+    name: '预发布环境',
+    baseUrl: 'https://staging-api.example.com',
+    devLoginEnabled: false
   }
 }
 
 const currentEnvironment = 'development'
 
 function getRuntimeConfig() {
+  let selected = currentEnvironment
+  if (typeof wx !== 'undefined' && typeof wx.getAccountInfoSync === 'function') {
+    const version = wx.getAccountInfoSync().miniProgram.envVersion
+    selected = ({ develop: 'development', trial: 'staging', release: 'production' })[version] || 'production'
+  }
   return {
-    environment: currentEnvironment,
-    ...environments[currentEnvironment]
+    environment: selected,
+    ...environments[selected]
   }
 }
 

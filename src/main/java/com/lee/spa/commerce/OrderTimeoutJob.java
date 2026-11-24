@@ -16,7 +16,7 @@ import java.time.*;
 public class OrderTimeoutJob {
     private final JdbcTemplate jdbc;
     private final OrderService orders;
-    @Scheduled(fixedDelay=60000,initialDelay=60000)
+    @Scheduled(fixedDelayString="${spa.orders.timeout-delay-ms:60000}",initialDelayString="${spa.orders.timeout-initial-delay-ms:60000}")
     public void closeExpired() {
         for(Long id:jdbc.queryForList("SELECT id FROM spa_order WHERE status='WAITING_PAYMENT' AND expires_at<=? LIMIT 100",Long.class,LocalDateTime.now(ZoneId.of("Asia/Shanghai")))) {
             try { orders.closeExpired(id); } catch(RuntimeException failure) { log.warn("订单超时关闭失败 id={}",id,failure); }

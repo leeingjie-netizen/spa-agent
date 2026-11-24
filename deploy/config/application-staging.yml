@@ -1,0 +1,8 @@
+# Safe staging defaults. Synthetic tests use a separate test profile/database.
+spa:
+  scheduling:
+    enabled: false
+  payment:
+    mock-enabled: false
+  auth:
+    dev-login-enabled: false

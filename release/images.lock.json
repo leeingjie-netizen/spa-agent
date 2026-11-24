@@ -1,0 +1,11 @@
+{
+  "platform": "linux/amd64",
+  "source": "locally inspected RepoDigests of round-three verified images",
+  "images": {
+    "maven:3.9.4-eclipse-temurin-17": "e3f36fd6d0949541de3b6a32bb3de30331b2bdb6bac8ba365c4f8a5f0fcd3e59",
+    "eclipse-temurin:17-jre-jammy": "c6a5dd70fb24f4e07ef88cbda8efb613a5a649a1af071a41de8eaabd1ee6b5da",
+    "mysql:8.0": "7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b",
+    "redis:7.4-alpine": "7f7d30b7fdd09467bac58198a1f166dd69789d348d4fe859cccb20e0cf287fbe",
+    "nginx:1.28-alpine": "a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236"
+  }
+}

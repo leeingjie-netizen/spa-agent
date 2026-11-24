@@ -1,0 +1,19 @@
+# Merge with compose.yaml only under a unique round-two project and private env file.
+services:
+  mysql:
+    environment:
+      SPA_DEPLOYMENT_MODE: acceptance
+    labels: {com.spa.purpose: round2-compose, com.spa.database: '${MYSQL_DATABASE:?required}'}
+  redis:
+    labels: {com.spa.purpose: round2-compose, com.spa.database: '${MYSQL_DATABASE:?required}'}
+  app:
+    labels: {com.spa.purpose: round2-compose, com.spa.database: '${MYSQL_DATABASE:?required}'}
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      SPA_DEPLOYMENT_MODE: acceptance
+      SPA_ACCEPTANCE_AUTHORIZED: 'true'
+      SPA_AUTH_DEV_LOGIN_ENABLED: 'true'
+      SPA_PAYMENT_MOCK_ENABLED: 'true'
+      SPA_SCHEDULING_ENABLED: 'false'
+  nginx:
+    labels: {com.spa.purpose: round2-compose, com.spa.database: '${MYSQL_DATABASE:?required}'}

@@ -1,0 +1,11 @@
+Excluded from release, retained in original private workspace:
+docs/**
+target/**
+backups/**
+.env and real environment files
+src/main/resources/application*.yml/yaml/properties
+miniprogram/project.private.config.json
+private keys and certificates
+db/verification/**
+legacy local baseline verification SQL
+legacy machine-specific HTTP, retirement, backup, restore and report tools

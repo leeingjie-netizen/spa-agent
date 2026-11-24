@@ -1,0 +1,30 @@
+{
+  "conclusion": "PASS",
+  "scope": "safe pre-commit candidate; not production approval",
+  "branch": "release/staging-v0.3.0-rc.1",
+  "base": "211d6c2e85ab50d3926f13409f7011df0fa46405",
+  "version": "0.3.0-rc.1",
+  "originalFileCount": 1396,
+  "originalFilesAndStatusUnchanged": true,
+  "businessAndExistingTestFilesCompared": 190,
+  "businessCodeMatchesOriginal": true,
+  "javaPass": 68,
+  "javaSkipped": 61,
+  "javaFailures": 0,
+  "newGuardTestsPass": 9,
+  "nodePass": 45,
+  "miniprogramPass": 19,
+  "compose": {
+    "staging": true,
+    "production": true,
+    "acceptance": true,
+    "redis": true
+  },
+  "jarSha256": "e4361aa1cc7e66cff7cc236806090639160b48f48b34cfe9a983170b66ae7c9e",
+  "realIndexEmpty": true,
+  "executableModesVerifiedInPrivateIndex": true,
+  "databasesAndContainerDataModified": false,
+  "tagPreserved": true,
+  "committed": false,
+  "pushed": false
+}

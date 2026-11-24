@@ -42,6 +42,7 @@ class OrderServiceTest {
     @Test void canceledOrderCannotBePaid(){lockFixture();row.put("status","CANCELLED");assertThrows(BusinessException.class,()->orders.pay(1,"MOCK","request-123"));verify(jdbc,never()).update(startsWith("INSERT INTO spa_payment"),any(Object[].class));}
     @Test void illegalStatusJumpDoesNotWrite(){lockFixture();AuthContext.set(new AuthPrincipal(99L,"ADMIN",null));assertThrows(BusinessException.class,()->orders.transition(1,"COMPLETED"));verify(jdbc,never()).update(startsWith("UPDATE spa_order"),any(Object[].class));}
     @Test void completedTransitionCreditsPointsOnce(){
+        row.put("appointment_date",LocalDate.now());row.put("end_time",LocalTime.MIDNIGHT);
         lockFixture();AuthContext.set(new AuthPrincipal(99L,"ADMIN",null));row.put("status","IN_SERVICE");
         orders.transition(1,"COMPLETED");
         verify(jdbc).update(startsWith("INSERT INTO spa_points_entry"),any(),eq(11L),eq(1L),eq(200),any());

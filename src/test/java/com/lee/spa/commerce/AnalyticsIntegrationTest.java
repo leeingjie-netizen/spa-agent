@@ -16,7 +16,7 @@ class AnalyticsIntegrationTest {
  @Autowired AnalyticsController analytics;@Autowired JdbcTemplate jdbc;
  @AfterEach void clear(){AuthContext.clear();}
  @Test void successfulRefundsAreNetAndTopupsNeverBecomeRevenue(){
-  assertEquals("spa",jdbc.queryForObject("SELECT DATABASE()",String.class));
+  try { com.lee.spa.AcceptanceIsolation.verify(jdbc.getDataSource()); } catch(Exception e) { throw new IllegalStateException(e); }
   long id=-Math.abs(System.nanoTime());
   AuthContext.set(new AuthPrincipal(id,"ADMIN",null));
   jdbc.update("INSERT INTO spa_order(id,appointment_id,order_no,user_id,amount,status,created_at,expires_at) VALUES(?,?,?,?,130,'WAITING_SERVICE','2096-01-05','2096-01-06')",id,id,"analytics-"+(-id),id);

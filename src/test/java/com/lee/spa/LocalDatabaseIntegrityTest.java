@@ -20,19 +20,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnabledIfEnvironmentVariable(named = "SPA_LOCAL_DB_TESTS", matches = "true")
 class LocalDatabaseIntegrityTest {
     private Connection connect() throws SQLException {
-        String url = System.getenv().getOrDefault("SPA_TEST_DB_URL", "jdbc:mysql://127.0.0.1:3306/spa");
-        if (!url.equals("jdbc:mysql://127.0.0.1:3306/spa")
-                && !url.equals("jdbc:mysql://localhost:3306/spa")) {
-            throw new IllegalArgumentException("Only the verified local development spa database is allowed");
-        }
-        String password = System.getenv("MYSQL_PWD");
+        String database = System.getenv("SPA_ACCEPTANCE_DB");
+        if(database == null || !database.matches("spa_acceptance_[0-9]{14}")) throw new IllegalStateException("Isolated acceptance database required");
+        String url = "jdbc:mysql://127.0.0.1:3306/" + database;
+        String password = System.getenv("SPA_ACCEPTANCE_DB_PASSWORD");
         if (password == null || password.isBlank()) {
             throw new IllegalStateException("MYSQL_PWD must be set explicitly for local database tests");
         }
         Connection connection = DriverManager.getConnection(
-                url + "?serverTimezone=Asia/Shanghai&connectTimeout=5000&socketTimeout=10000", "root", password);
+                url + "?serverTimezone=Asia/Shanghai&connectTimeout=5000&socketTimeout=10000", System.getenv("SPA_ACCEPTANCE_DB_USER"), password);
         try {
-            assertEquals("spa", scalar(connection, "SELECT DATABASE()"));
+            assertEquals(database, scalar(connection, "SELECT DATABASE()"));
             assertEquals("8", scalar(connection, "SELECT SUBSTRING_INDEX(VERSION(), '.', 1)"));
             connection.setAutoCommit(false);
             return connection;
@@ -47,21 +45,21 @@ class LocalDatabaseIntegrityTest {
         try (Connection connection = connect()) {
             try {
                 assertEquals("MANUAL", scalar(connection, "SELECT COLUMN_DEFAULT FROM information_schema.COLUMNS "
-                        + "WHERE TABLE_SCHEMA='spa' AND TABLE_NAME='staff_schedule' AND COLUMN_NAME='source'"));
+                        + "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='staff_schedule' AND COLUMN_NAME='source'"));
                 assertEquals("NO", scalar(connection, "SELECT IS_NULLABLE FROM information_schema.COLUMNS "
-                        + "WHERE TABLE_SCHEMA='spa' AND TABLE_NAME='staff_schedule' AND COLUMN_NAME='source'"));
+                        + "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='staff_schedule' AND COLUMN_NAME='source'"));
                 assertEquals(2, count(connection, "SELECT COUNT(*) FROM information_schema.COLUMNS "
-                        + "WHERE TABLE_SCHEMA='spa' AND TABLE_NAME='staff_schedule' "
+                        + "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='staff_schedule' "
                         + "AND COLUMN_NAME IN ('start_time','end_time') AND IS_NULLABLE='YES'"));
                 assertEquals(2, count(connection, "SELECT COUNT(*) FROM information_schema.COLUMNS "
-                        + "WHERE TABLE_SCHEMA='spa' AND TABLE_NAME='staff_schedule' "
+                        + "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='staff_schedule' "
                         + "AND COLUMN_NAME IN ('break_start_time','break_end_time')"));
                 assertUnique(connection, "staff_schedule", "staff_id,work_date");
                 assertUnique(connection, "staff_weekly_rule", "staff_id,day_of_week");
                 assertUnique(connection, "appointment", "request_id");
                 assertUnique(connection, "appointment_slot", "staff_id,slot_time");
                 assertEquals(4, count(connection, "SELECT COUNT(*) FROM information_schema.TABLES "
-                        + "WHERE TABLE_SCHEMA='spa' AND TABLE_NAME IN ('staff_schedule', 'staff_weekly_rule', "
+                        + "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('staff_schedule', 'staff_weekly_rule', "
                         + "'appointment','appointment_slot') AND ENGINE='InnoDB'"));
             } finally {
                 connection.rollback();
@@ -132,7 +130,7 @@ class LocalDatabaseIntegrityTest {
 
     private static void assertUnique(Connection connection, String table, String columns) throws SQLException {
         assertEquals(1, count(connection, "SELECT COUNT(*) FROM (SELECT INDEX_NAME FROM information_schema.STATISTICS "
-                + "WHERE TABLE_SCHEMA='spa' AND TABLE_NAME=? AND NON_UNIQUE=0 GROUP BY INDEX_NAME "
+                + "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND NON_UNIQUE=0 GROUP BY INDEX_NAME "
                 + "HAVING GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX)=?) matching_indexes", table, columns));
     }
 
